@@ -28,15 +28,14 @@ export const AuthProvider = ({ children }) => {
     const [spotifyAccessToken, setSpotifyAccessToken] = useState(null);
     const [musicInstance, setMusicInstance] = useState(null);
 
-    useEffect(async () => {
+    useEffect(() => {
 
         sessionStorage.setItem("DT", '{DEVELOPER_TOKEN}');
 
         const token = getSpotifyAccessTokenFromCookie();
         setSpotifyAccessToken(token);
 
-        await configureMusicKit();
-
+        configureMusicKit();
     }, []);
 
     const configureMusicKit = async () => {

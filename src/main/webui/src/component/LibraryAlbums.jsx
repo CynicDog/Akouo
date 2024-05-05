@@ -11,7 +11,7 @@ import {
     Spinner
 } from '@patternfly/react-core';
 import {useQuery} from 'react-query';
-import {fetchLibraryAlbumRelationByName} from '../data/api';
+import {fetchLibraryAlbumRelationByName} from '../data/appleAPI.js';
 
 const LibraryAlbums = ({albums, isAlbumLoading}) => {
     return (

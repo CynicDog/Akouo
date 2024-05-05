@@ -13,13 +13,17 @@ import theaterJS from 'theaterjs';
 import {useQuery} from "react-query";
 import DarkModeSwitch from "./component/DarkmodeSwitch.jsx";
 import {
-    fetchGreeting
-} from './data/api';
+    fetchGreeting, fetchLibraryPlaylists
+} from './data/appleAPI.js';
 import {useAuth, useTheme} from "./Context.jsx";
 import BackToTopButton from "./component/BackToTopButton.jsx";
 import AuthArea from "./component/AuthArea.jsx";
+import AppleMusicArea from "./component/apple/PlaylistsArea.jsx";
 
 function App() {
+
+    const developerToken = sessionStorage.getItem('DT');
+    const musicUserToken = sessionStorage.getItem('MUT');
 
     const {theme} = useTheme();
     const {isAppleAuthenticated, spotifyAccessToken} = useAuth();
@@ -62,7 +66,7 @@ function App() {
             </Flex>
 
             {isAppleAuthenticated ? (
-                <div>apple music authenticated</div>
+                <AppleMusicArea developerToken={developerToken} musicUserToken={musicUserToken} />
             ) : (
                 <div>apple music not authenticated</div>
             )}

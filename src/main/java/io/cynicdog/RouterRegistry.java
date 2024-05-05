@@ -39,7 +39,7 @@ public class RouterRegistry {
         router.get("/callback").handler(OAuthAPI::callback);
 
         router.get("/greeting").handler(ctx ->
-                ctx.response().end("Welcome to Akouo, <br/ > your gateway to a seamless journey of music exploration and connection 🎶")
+                ctx.response().end("Welcome to Akouo 🎶 <br/ > Your gateway to a seamless journey of music exploration and connection!")
         );
 
         router.route("/eventbus/*").subRouter(

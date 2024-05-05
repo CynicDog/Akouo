@@ -57,6 +57,16 @@ export const fetchLibraryAlbumRelationByName = async (developerToken, musicUserT
     return fetchData(url, developerToken, musicUserToken);
 };
 
+export const fetchLibraryPlaylists = async (developerToken, musicUserToken) => {
+    const url = 'https://api.music.apple.com/v1/me/library/playlists';
+    return fetchData(url, developerToken, musicUserToken);
+};
+
+export const fetchLibraryPlaylistRelationByName = async (developerToken, musicUserToken, id, relation) => {
+    const url = `https://api.music.apple.com/v1/me/library/playlists/${String(id)}/${relation}`;
+    return fetchData(url, developerToken, musicUserToken);
+}
+
 const fetchData = async (url, developerToken, musicUserToken) => {
     if (!developerToken) {
         throw new Error('Developer Token not found');

@@ -4,10 +4,16 @@
   padding: 2rem;
 }
 
-.back-to-top{
+.back-to-top {
+  opacity: 0.3;
   position: fixed;
   right: 50%;
   transform: translateX(50%);
-  bottom: 1%;
+  bottom: 3%;
   z-index: 1;
 }
+
+.back-to-top:hover {
+  opacity: 1;
+}
+
