@@ -1,7 +1,7 @@
 import './App.css';
-import React, {useEffect, useState} from 'react';
+import React, {useEffect} from 'react';
 import {
-    Brand,
+    Brand, EmptyState, EmptyStateBody, EmptyStateHeader, EmptyStateIcon, EmptyStateVariant,
     Flex,
     FlexItem,
     Text,
@@ -13,7 +13,7 @@ import theaterJS from 'theaterjs';
 import {useQuery} from "react-query";
 import DarkModeSwitch from "./component/DarkmodeSwitch.jsx";
 import {
-    fetchGreeting, fetchLibraryPlaylists
+    fetchGreeting
 } from './data/appleAPI.js';
 import {useAuth, useTheme} from "./Context.jsx";
 import BackToTopButton from "./component/BackToTopButton.jsx";
@@ -21,6 +21,9 @@ import AuthArea from "./component/AuthArea.jsx";
 import Playlists from "./component/apple/Playlists.jsx";
 import RecentlyPlayed from "./component/apple/RecentlyPlayed.jsx";
 import Recommendations from "./component/apple/Recommendations.jsx";
+import {CubesIcon} from "@patternfly/react-icons";
+import AppleIcon from "../public/apple.jsx";
+import SpotifyIcon from "../public/spotify.jsx";
 
 function App() {
 
@@ -67,24 +70,39 @@ function App() {
                 </FlexItem>
             </Flex>
 
-            <div id="apple-music" className="my-3">
+            <div id="apple-music" className="border rounded-4 p-3 my-3">
+                <h3 className="fw-lighter">Apple Music</h3>
                 {isAppleAuthenticated ? (
-                    <div className="border rounded-4 p-3 ">
-                        <h3 className="fw-lighter">Apple Music</h3>
+                    <div className="">
                         <Playlists developerToken={developerToken} musicUserToken={musicUserToken}/>
-                        <RecentlyPlayed developerToken={developerToken} musicUserToken={musicUserToken}/>
                         <Recommendations developerToken={developerToken} musicUserToken={musicUserToken}/>
+                        <RecentlyPlayed developerToken={developerToken} musicUserToken={musicUserToken}/>
                     </div>
                 ) : (
-                    <div>apple music not authenticated</div>
+                    <EmptyState variant={EmptyStateVariant.sm}>
+                        <EmptyStateHeader titleText="Empty state" headingLevel="h4" icon={<EmptyStateIcon icon={CubesIcon} />} />
+                        <EmptyStateBody>
+                            sign in to Apple Music first ( <AppleIcon /> )
+                        </EmptyStateBody>
+                    </EmptyState>
                 )}
             </div>
 
-            {spotifyAccessToken ? (
-                <div>spotify authenticated</div>
-            ) : (
-                <div>spotify not authenticated</div>
-            )}
+            <div id="spotify" className="border rounded-4 p-3 my-3">
+                <h3 className="fw-lighter">Spotify</h3>
+                {spotifyAccessToken ? (
+                    <div className="">
+
+                    </div>
+                ) : (
+                    <EmptyState variant={EmptyStateVariant.lg}>
+                        <EmptyStateHeader titleText="Empty state" headingLevel="h4" icon={<EmptyStateIcon icon={CubesIcon} />} />
+                        <EmptyStateBody>
+                            sign in to Spotify first ( <SpotifyIcon /> )
+                        </EmptyStateBody>
+                    </EmptyState>
+                )}
+            </div>
 
             <BackToTopButton/>
         </>

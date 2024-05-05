@@ -6,15 +6,6 @@ export const fetchGreeting = async () => {
     return response.text();
 };
 
-export const fetchHouses = async (detailed = false) => {
-    const queryParams = detailed ? '?detailed=true' : '';
-    const response = await fetch(`/houses${queryParams}`);
-    if (!response.ok) {
-        throw new Error('Failed to fetch houses');
-    }
-    return response.json();
-};
-
 // Fetch all the library songs in alphabetical order.
 export const fetchSongs = async (developerToken, musicUserToken) => {
     const url = 'https://api.music.apple.com/v1/me/library/songs?l=en';
@@ -57,16 +48,31 @@ export const fetchLibraryAlbumRelationByName = async (developerToken, musicUserT
     return fetchData(url, developerToken, musicUserToken);
 };
 
+// Fetch an album’s relationship by using its identifier.
+export const fetchCatalogAlbumRelationByName = async (developerToken, musicUserToken, id, relation) => {
+    const url = `https://api.music.apple.com/v1/catalog/kr/albums/${String(id)}/${relation}`;
+    return fetchData(url, developerToken, musicUserToken);
+};
+
+// Fetch all the library playlists in alphabetical order.
 export const fetchLibraryPlaylists = async (developerToken, musicUserToken) => {
     const url = 'https://api.music.apple.com/v1/me/library/playlists';
     return fetchData(url, developerToken, musicUserToken);
 };
 
+// Fetch a playlist’s relationship by using its identifier.
+export const fetchCatalogPlaylistRelationByName = async (developerToken, musicUserToken, id, relation) => {
+    const url = `https://api.music.apple.com/v1/catalog/kr/playlists/${String(id)}/${relation}`;
+    return fetchData(url, developerToken, musicUserToken);
+};
+
+// Fetch a library playlist’s relationship by using its identifier.
 export const fetchLibraryPlaylistRelationByName = async (developerToken, musicUserToken, id, relation) => {
     const url = `https://api.music.apple.com/v1/me/library/playlists/${String(id)}/${relation}`;
     return fetchData(url, developerToken, musicUserToken);
 }
 
+// Fetch default recommendations.
 export const fetchRecommendations = async (developerToken, musicUserToken) => {
     const url = 'https://api.music.apple.com/v1/me/recommendations';
     return fetchData(url, developerToken, musicUserToken);
