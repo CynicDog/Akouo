@@ -67,6 +67,11 @@ export const fetchLibraryPlaylistRelationByName = async (developerToken, musicUs
     return fetchData(url, developerToken, musicUserToken);
 }
 
+export const fetchRecommendations = async (developerToken, musicUserToken) => {
+    const url = 'https://api.music.apple.com/v1/me/recommendations';
+    return fetchData(url, developerToken, musicUserToken);
+};
+
 const fetchData = async (url, developerToken, musicUserToken) => {
     if (!developerToken) {
         throw new Error('Developer Token not found');

@@ -18,7 +18,9 @@ import {
 import {useAuth, useTheme} from "./Context.jsx";
 import BackToTopButton from "./component/BackToTopButton.jsx";
 import AuthArea from "./component/AuthArea.jsx";
-import AppleMusicArea from "./component/apple/PlaylistsArea.jsx";
+import Playlists from "./component/apple/Playlists.jsx";
+import RecentlyPlayed from "./component/apple/RecentlyPlayed.jsx";
+import Recommendations from "./component/apple/Recommendations.jsx";
 
 function App() {
 
@@ -45,7 +47,7 @@ function App() {
 
     return (
         <>
-            <AuthArea />
+            <AuthArea/>
 
             <Flex>
                 <FlexItem>
@@ -65,19 +67,26 @@ function App() {
                 </FlexItem>
             </Flex>
 
-            {isAppleAuthenticated ? (
-                <AppleMusicArea developerToken={developerToken} musicUserToken={musicUserToken} />
-            ) : (
-                <div>apple music not authenticated</div>
-            )}
+            <div id="apple-music" className="my-3">
+                {isAppleAuthenticated ? (
+                    <div className="border rounded-4 p-3 ">
+                        <h3 className="fw-lighter">Apple Music</h3>
+                        <Playlists developerToken={developerToken} musicUserToken={musicUserToken}/>
+                        <RecentlyPlayed developerToken={developerToken} musicUserToken={musicUserToken}/>
+                        <Recommendations developerToken={developerToken} musicUserToken={musicUserToken}/>
+                    </div>
+                ) : (
+                    <div>apple music not authenticated</div>
+                )}
+            </div>
 
             {spotifyAccessToken ? (
                 <div>spotify authenticated</div>
-            ): (
+            ) : (
                 <div>spotify not authenticated</div>
             )}
 
-            <BackToTopButton />
+            <BackToTopButton/>
         </>
     );
 }

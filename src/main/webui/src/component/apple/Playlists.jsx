@@ -12,7 +12,7 @@ import {
     CardExpandableContent, Label, Tooltip, ExpandableSection, Badge
 } from '@patternfly/react-core';
 
-function AppleMusicArea({developerToken, musicUserToken}) {
+function Playlists({developerToken, musicUserToken}) {
 
     const [isExpanded, setIsExpanded] = React.useState(false);
     const onToggle = (_event, isExpanded) => {
@@ -41,7 +41,7 @@ function AppleMusicArea({developerToken, musicUserToken}) {
                                 </span> {' '}
                                 <Badge isRead>
                                     <span className="fw-lighter">
-                                        {applePlaylists.data.length}
+                                        {applePlaylists.meta.total}
                                     </span>
                                 </Badge>
                             </>
@@ -50,8 +50,11 @@ function AppleMusicArea({developerToken, musicUserToken}) {
                         onToggle={onToggle}
                         isExpanded={isExpanded}>
                         {applePlaylists.data.map(playlist => (
-                            <PlaylistCard key={playlist.id} playlist={playlist} developerToken={developerToken}
-                                          musicUserToken={musicUserToken}/>
+                            <PlaylistCard
+                                key={playlist.id}
+                                playlist={playlist}
+                                developerToken={developerToken}
+                                musicUserToken={musicUserToken}/>
                         ))}
                     </ExpandableSection>
                 </div>
@@ -67,8 +70,8 @@ const PlaylistCard = ({playlist, developerToken, musicUserToken}) => {
         setIsExpanded(prevExpanded => !prevExpanded);
     };
 
-    const {data: songs, isLoading: isSongLoading} = useQuery(
-        ['playlistSongs', playlist.id],
+    const {data: tracks, isLoading: isTrackLoading} = useQuery(
+        ['playlistTracks', playlist.id],
         () => fetchLibraryPlaylistRelationByName(developerToken, musicUserToken, playlist.id, 'tracks'),
         {
             enabled: !!playlist.id,
@@ -104,13 +107,13 @@ const PlaylistCard = ({playlist, developerToken, musicUserToken}) => {
                 </CardTitle>
             </CardHeader>
             <CardExpandableContent>
-                {isSongLoading ? (
+                {isTrackLoading ? (
                     <div className="d-flex justify-content-center">
                         <Spinner/>
                     </div>
                 ) : (
                     <CardBody>
-                        <SongList songs={songs.data}/>
+                        <TrackList tracks={tracks.data}/>
                     </CardBody>
                 )}
             </CardExpandableContent>
@@ -118,24 +121,28 @@ const PlaylistCard = ({playlist, developerToken, musicUserToken}) => {
     );
 };
 
-const SongList = ({songs}) => {
+const TrackList = ({tracks}) => {
     return (
         <List isPlain isBordered>
-            {songs.map((song, index) => (
+            {tracks.map((track, index) => (
                 <ListItem className="d-flex fw-lighter" key={index}>
                     <span className="fw-light">
-                        {song.attributes.name} {' '}
+                        {track.attributes.name} {' '}
                         <Label isCompact>
-                        {song.attributes.genreNames.join(",")}
+                        {track.attributes.genreNames.join(",")}
                     </Label>
                     </span>
                     <span className="ms-auto">
-                        <Label isCompact>
-                            {song.attributes.artistName}
-                        </Label>
-                        <Label isCompact color="blue">
-                            {song.attributes.albumName}
-                        </Label>
+                        <Tooltip content={<div>{track.attributes.artistName}</div>}>
+                            <Label textMaxWidth="100px" isCompact>
+                                {track.attributes.artistName}
+                            </Label>
+                        </Tooltip> {' '}
+                        <Tooltip content={<div>{track.attributes.albumName}</div>}>
+                            <Label isCompact textMaxWidth="100px" color="blue">
+                                {track.attributes.albumName}
+                            </Label>
+                        </Tooltip>
                     </span>
                 </ListItem>
             ))}
@@ -143,4 +150,4 @@ const SongList = ({songs}) => {
     );
 };
 
-export default AppleMusicArea;
+export default Playlists;
