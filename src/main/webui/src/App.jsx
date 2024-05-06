@@ -1,5 +1,5 @@
 import './App.css';
-import React, {useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
     Brand, EmptyState, EmptyStateBody, EmptyStateHeader, EmptyStateIcon, EmptyStateVariant,
     Flex,
@@ -33,6 +33,8 @@ function App() {
     const {theme} = useTheme();
     const {isAppleAuthenticated, spotifyAccessToken} = useAuth();
 
+    const [isCardPlayerOpen, setIsCardPlayerOpen] = useState(true);
+
     const {data: message, isLoading: isMessageLoading, error: messageError} = useQuery(
         'greeting',
         fetchGreeting,
@@ -47,6 +49,10 @@ function App() {
             .addScene(`Brand: ${message}`, 1000)
             .play();
     }, [message, isMessageLoading]);
+
+    const toggleCardPlayer = () => {
+        setIsCardPlayerOpen((prevState) => !prevState);
+    };
 
     return (
         <>
@@ -80,9 +86,10 @@ function App() {
                     </div>
                 ) : (
                     <EmptyState variant={EmptyStateVariant.sm}>
-                        <EmptyStateHeader titleText="Empty state" headingLevel="h4" icon={<EmptyStateIcon icon={CubesIcon} />} />
+                        <EmptyStateHeader titleText="Empty state" headingLevel="h4"
+                                          icon={<EmptyStateIcon icon={CubesIcon}/>}/>
                         <EmptyStateBody>
-                            sign in to Apple Music first ( <AppleIcon /> )
+                            sign in to Apple Music first ( <AppleIcon/> )
                         </EmptyStateBody>
                     </EmptyState>
                 )}
@@ -96,13 +103,25 @@ function App() {
                     </div>
                 ) : (
                     <EmptyState variant={EmptyStateVariant.lg}>
-                        <EmptyStateHeader titleText="Empty state" headingLevel="h4" icon={<EmptyStateIcon icon={CubesIcon} />} />
+                        <EmptyStateHeader titleText="Empty state" headingLevel="h4"
+                                          icon={<EmptyStateIcon icon={CubesIcon}/>}/>
                         <EmptyStateBody>
-                            sign in to Spotify first ( <SpotifyIcon /> )
+                            sign in to Spotify first ( <SpotifyIcon/> )
                         </EmptyStateBody>
                     </EmptyState>
                 )}
             </div>
+
+            {isAppleAuthenticated && (
+                <>
+                    <div id="card-toggler" className={isCardPlayerOpen ? '' : 'hidden'} onClick={toggleCardPlayer}>
+                        {isCardPlayerOpen ? <span className='fw-lighter'>hide card player</span> : <a>🎧</a>}
+                    </div>
+                    {isCardPlayerOpen && (
+                        <apple-music-card-player theme={theme}/>
+                    )}
+                </>
+            )}
 
             <BackToTopButton/>
         </>

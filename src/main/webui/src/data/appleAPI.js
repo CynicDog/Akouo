@@ -56,7 +56,7 @@ export const fetchCatalogAlbumRelationByName = async (developerToken, musicUserT
 
 // Fetch all the library playlists in alphabetical order.
 export const fetchLibraryPlaylists = async (developerToken, musicUserToken) => {
-    const url = 'https://api.music.apple.com/v1/me/library/playlists';
+    const url = 'https://api.music.apple.com/v1/me/library/playlists?l=en';
     return fetchData(url, developerToken, musicUserToken);
 };
 
@@ -74,7 +74,7 @@ export const fetchLibraryPlaylistRelationByName = async (developerToken, musicUs
 
 // Fetch default recommendations.
 export const fetchRecommendations = async (developerToken, musicUserToken) => {
-    const url = 'https://api.music.apple.com/v1/me/recommendations';
+    const url = 'https://api.music.apple.com/v1/me/recommendations?l=en';
     return fetchData(url, developerToken, musicUserToken);
 };
 

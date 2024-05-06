@@ -17,3 +17,56 @@
   opacity: 1;
 }
 
+apple-music-card-player {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 9999;
+  width: 200px;
+}
+
+#card-toggler {
+  position: fixed;
+  width: 200px;
+  height: 10px;
+  bottom: 320px;
+  right: 20px;
+  z-index: 10000;
+  cursor: pointer;
+  background-color: rgba(127, 127, 127, 0.10);
+  color: white;
+  padding: 8px;
+  border-radius: 8px;
+  transition: bottom 0.3s, width 0.5s ease-out;
+  overflow: hidden;
+}
+
+#card-toggler span {
+  color: darkgrey;
+  visibility: hidden;
+  opacity: 0;
+  transition: visibility 0s ease, opacity 1s ease
+}
+
+#card-toggler:hover {
+  height: auto;
+}
+
+#card-toggler:hover span {
+  visibility: visible;
+  opacity: 1;
+  height: auto; /* Allow the nested span to expand */
+}
+
+#card-toggler.hidden {
+  width: 32px;
+  height: auto;
+  bottom: 20px;
+  box-shadow: rgba(0, 0, 0, 0.25) 0px 54px 55px, rgba(0, 0, 0, 0.12) 0px -12px 30px, rgba(0, 0, 0, 0.12) 0px 4px 6px, rgba(0, 0, 0, 0.17) 0px 12px 13px, rgba(0, 0, 0, 0.09) 0px -3px 5px;
+}
+
+#card-toggler a {
+   display: flex;
+   align-items: center;
+   justify-content: center;
+}

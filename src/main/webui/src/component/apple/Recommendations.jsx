@@ -138,7 +138,11 @@ const TrackListPopoverContent = ({relation, developerToken, musicUserToken}) => 
         }
     );
 
-    if (isLoading) return <Spinner/>;
+    if (isLoading) return (
+        <div className="d-flex justify-content-center">
+            <Spinner/>
+        </div>
+    );
     if (isError) return <div>Error fetching tracks</div>;
 
     return (

@@ -73,15 +73,6 @@ const PlaylistCard = ({playlist, developerToken, musicUserToken}) => {
     const [isExpanded, setIsExpanded] = React.useState(false);
     const drawerRef = React.useRef();
 
-    const {data: tracks, isLoading: isTrackLoading} = useQuery(
-        ['playlistTracks', playlist.id],
-        () => fetchLibraryPlaylistRelationByName(developerToken, musicUserToken, playlist.id, 'tracks'),
-        {
-            enabled: !!playlist.id,
-            staleTime: 7_200_000 // 2 hours
-        }
-    );
-
     const onExpand = () => {
         drawerRef.current && drawerRef.current.focus();
     };
@@ -100,11 +91,11 @@ const PlaylistCard = ({playlist, developerToken, musicUserToken}) => {
     }
 
     return (
-        <ListItem onClick={onClick} aria-expanded={isExpanded}>
-            <div className="d-flex m-1">
-                <span>
-                    {playlist.attributes.name} {' '}
-                </span>
+        <ListItem aria-expanded={isExpanded}>
+            <div className="d-flex">
+                <Label variant="outline" onClick={() => onClick()}>
+                    {playlist.attributes.name}
+                </Label>
                 <span className="ms-auto">
                     <Tooltip content={<div>date added</div>}>
                         <Label isCompact>
@@ -125,13 +116,10 @@ const PlaylistCard = ({playlist, developerToken, musicUserToken}) => {
                             <DrawerPanelContent>
                                 <DrawerHead>
                                     <span tabIndex={isExpanded ? 0 : -1} ref={drawerRef}>
-                                        {isTrackLoading ? (
-                                            <div className="d-flex justify-content-center">
-                                                <Spinner/>
-                                            </div>
-                                        ) : (
-                                            <TrackList tracks={tracks.data}/>
-                                        )}
+                                        <PlaylistDetail
+                                            playlist={playlist}
+                                            developerToken={developerToken}
+                                            musicUserToken={musicUserToken}/>
                                     </span>
                                 </DrawerHead>
                             </DrawerPanelContent>
@@ -143,33 +131,50 @@ const PlaylistCard = ({playlist, developerToken, musicUserToken}) => {
     );
 };
 
-const TrackList = ({tracks}) => {
+const PlaylistDetail = ({playlist, developerToken, musicUserToken}) => {
+
+    const {data: tracks, isLoading: isTrackLoading} = useQuery(
+        ['playlistTracks', playlist.id],
+        () => fetchLibraryPlaylistRelationByName(developerToken, musicUserToken, playlist.id, 'tracks'),
+        {
+            enabled: !!playlist.id,
+            staleTime: 7_200_000 // 2 hours
+        }
+    );
 
     return (
-        <List isPlain isBordered>
-            {tracks.map((track, index) => (
-                <ListItem className="d-flex fw-lighter" key={index}>
-                    <span className="fw-light">
-                        {track.attributes.name} {' '}
-                        <Label isCompact>
-                        {track.attributes.genreNames.join(",")}
-                    </Label>
-                    </span>
-                    <span className="ms-auto">
-                        <Tooltip content={<div>{track.attributes.artistName}</div>}>
-                            <Label textMaxWidth="100px" isCompact>
-                                {track.attributes.artistName}
-                            </Label>
-                        </Tooltip> {' '}
-                        <Tooltip content={<div>{track.attributes.albumName}</div>}>
-                            <Label isCompact textMaxWidth="100px" color="blue">
-                                {track.attributes.albumName}
-                            </Label>
-                        </Tooltip>
-                    </span>
-                </ListItem>
-            ))}
-        </List>
+        <>
+            {isTrackLoading ? (
+                <div className="d-flex justify-content-center">
+                    <Spinner/>
+                </div>
+            ) : (
+                <List isPlain isBordered>
+                    {tracks.data.map((track, index) => (
+                        <ListItem className="d-flex fw-lighter" key={index}>
+                            <span className="fw-light">
+                                {track.attributes.name} {' '}
+                                <Label isCompact>
+                                    {track.attributes.genreNames.join(",")}
+                                </Label>
+                            </span>
+                            <span className="ms-auto">
+                                <Tooltip content={<div>{track.attributes.artistName}</div>}>
+                                <Label textMaxWidth="100px" isCompact>
+                                    {track.attributes.artistName}
+                                </Label>
+                                </Tooltip> {' '}
+                                <Tooltip content={<div>{track.attributes.albumName}</div>}>
+                                    <Label isCompact textMaxWidth="100px" color="blue">
+                                        {track.attributes.albumName}
+                                    </Label>
+                                </Tooltip>
+                            </span>
+                        </ListItem>
+                    ))}
+                </List>
+            )}
+        </>
     );
 };
 
