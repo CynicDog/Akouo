@@ -58,25 +58,27 @@ const TrackCard = ({track}) => {
     return (
         <Card id={track.id}>
             <CardHeader>
-                <CardTitle className="d-flex fw-lighter">
-                    <span className="fw-light">
+                <CardTitle className="row fw-lighter">
+                    <div className="col-lg-8 fw-light">
                         {track.attributes.name} {' '}
                         <Label isCompact textMaxWidth="200px">
                             {track.attributes.genreNames.join(", ")}
                         </Label>
-                    </span>
-                    <span className="ms-auto">
-                        <Tooltip content={<div>{track.attributes.artistName}</div>}>
-                            <Label isCompact textMaxWidth="100px">
-                                {track.attributes.artistName}
-                            </Label>
-                        </Tooltip> {' '}
-                        <Tooltip content={<div>{track.attributes.albumName}</div>}>
-                            <Label isCompact textMaxWidth="100px" color="blue">
-                                {track.attributes.albumName}
-                            </Label>
-                        </Tooltip>
-                    </span>
+                    </div>
+                    <div className="col-lg-4">
+                        <div className="d-flex justify-content-end">
+                            <Tooltip content={<div>{track.attributes.artistName}</div>}>
+                                <Label isCompact textMaxWidth="100px">
+                                    {track.attributes.artistName}
+                                </Label>
+                            </Tooltip> {' '}
+                            <Tooltip content={<div>{track.attributes.albumName}</div>}>
+                                <Label isCompact textMaxWidth="100px" color="blue">
+                                    {track.attributes.albumName}
+                                </Label>
+                            </Tooltip>
+                        </div>
+                    </div>
                 </CardTitle>
             </CardHeader>
         </Card>

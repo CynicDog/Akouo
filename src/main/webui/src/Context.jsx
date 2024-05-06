@@ -104,6 +104,7 @@ export const AuthProvider = ({ children }) => {
     const value = {
         isAppleAuthenticated,
         spotifyAccessToken,
+        musicInstance,
         handleAppleSignIn,
         handleAppleSignOut,
         handleSpotifySignOut

@@ -9,11 +9,10 @@ import {
     Tooltip,
     ExpandableSection,
     Badge,
-    DrawerCloseButton,
-    DrawerActions,
     DrawerHead,
-    DrawerPanelContent, Drawer, DrawerContent, DrawerContentBody, CardBody
+    DrawerPanelContent, Drawer, DrawerContent, DrawerContentBody
 } from '@patternfly/react-core';
+import {useAuth} from "../../Context.jsx";
 
 function Playlists() {
 
@@ -71,6 +70,8 @@ function Playlists() {
 
 const PlaylistCard = ({playlist}) => {
 
+    const { musicInstance } = useAuth();
+
     const [isExpanded, setIsExpanded] = React.useState(false);
     const drawerRef = React.useRef();
 
@@ -98,6 +99,11 @@ const PlaylistCard = ({playlist}) => {
                     {playlist.attributes.name}
                 </Label>
                 <span className="ms-auto">
+                    <Label isCompact color="blue" onClick={async () => {
+                        await musicInstance.setQueue({playlist: playlist.id, startPlaying: true});
+                    }}>
+                        play
+                    </Label>{' '}
                     <Tooltip content={<div>date added</div>}>
                         <Label isCompact>
                             {trimDateTime(playlist.attributes.dateAdded)}
@@ -153,25 +159,27 @@ const PlaylistDetail = ({playlist}) => {
             ) : (
                 <List isPlain isBordered>
                     {tracks.data.map((track, index) => (
-                        <ListItem className="d-flex fw-lighter" key={index}>
-                            <span className="fw-light">
+                        <ListItem className="row fw-lighter" key={index}>
+                            <div className="col-lg-8 fw-light">
                                 {track.attributes.name} {' '}
                                 <Label isCompact>
                                     {track.attributes.genreNames.join(",")}
                                 </Label>
-                            </span>
-                            <span className="ms-auto">
-                                <Tooltip content={<div>{track.attributes.artistName}</div>}>
-                                <Label textMaxWidth="100px" isCompact>
-                                    {track.attributes.artistName}
-                                </Label>
-                                </Tooltip> {' '}
-                                <Tooltip content={<div>{track.attributes.albumName}</div>}>
-                                    <Label isCompact textMaxWidth="100px" color="blue">
-                                        {track.attributes.albumName}
+                            </div>
+                            <div className="col-lg-4">
+                                <div className="d-flex justify-content-end">
+                                    <Tooltip content={<div>{track.attributes.artistName}</div>}>
+                                    <Label textMaxWidth="100px" isCompact>
+                                        {track.attributes.artistName}
                                     </Label>
-                                </Tooltip>
-                            </span>
+                                    </Tooltip>
+                                    <Tooltip content={<div>{track.attributes.albumName}</div>}>
+                                        <Label isCompact textMaxWidth="100px" color="blue">
+                                            {track.attributes.albumName}
+                                        </Label>
+                                    </Tooltip>
+                                </div>
+                            </div>
                         </ListItem>
                     ))}
                 </List>

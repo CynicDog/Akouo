@@ -140,11 +140,6 @@ const TrackListPopoverContent = ({relation}) => {
         }
     );
 
-    if (isLoading) return (
-        <div className="d-flex justify-content-center">
-            <Spinner/>
-        </div>
-    );
     if (isError) return <div>Error fetching tracks</div>;
 
     return (
@@ -156,11 +151,17 @@ const TrackListPopoverContent = ({relation}) => {
                     </Text>
                 </TextContent>
             )}
-            <div style={{maxHeight: '150px', overflowY: 'auto'}} className="">
-                {tracks && tracks.data.map((track, idx) => (
-                    <div key={idx} className="fw-lighter">{track.attributes.name}</div>
-                ))}
-            </div>
+            {isLoading ? (
+                <div className="d-flex justify-content-center">
+                    <Spinner/>
+                </div>
+            ) : (
+                <div style={{maxHeight: '150px', overflowY: 'auto'}} className="">
+                    {tracks && tracks.data.map((track, idx) => (
+                        <div key={idx} className="fw-lighter">{track.attributes.name}</div>
+                    ))}
+                </div>
+            )}
         </>
     );
 };
