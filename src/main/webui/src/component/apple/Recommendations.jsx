@@ -99,13 +99,23 @@ const RecommendationCard = ({recommendation, developerToken, musicUserToken}) =>
                                         </>
                                     }
                                     bodyContent={
-                                        <TrackListPopoverContent relation={relation} developerToken={developerToken}
-                                                                 musicUserToken={musicUserToken}/>
+                                        <TrackListPopoverContent
+                                            relation={relation}
+                                            developerToken={developerToken}
+                                            musicUserToken={musicUserToken}/>
                                     }
                                 >
-                                    <a onClick={() => fetchAndDisplayTracks(relation)}>
-                                        <apple-music-artwork source={relation.attributes.artwork.url} width="250"/>
-                                    </a>
+                                    <>
+                                        {relation.type === 'playlists' && (
+                                            <apple-music-artwork-lockup type="playlist" content-id={relation.id} width="250"/>
+                                        )}
+                                        {relation.type === 'albums' && (
+                                            <apple-music-artwork-lockup type="album" content-id={relation.id} width="250"/>
+                                        )}
+                                        {relation.type ==='stations' && (
+                                            <apple-music-artwork source={relation.attributes.artwork.url} width="250"/>
+                                        )}
+                                    </>
                                 </Popover>
                             </div>
                         ))}

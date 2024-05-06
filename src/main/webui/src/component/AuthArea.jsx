@@ -21,26 +21,26 @@ const AuthArea = () => {
     return (
         <div className="d-flex justify-content-end p-3">
             {isAppleAuthenticated ? (
-                <div onClick={appleSignOut} className="btn">
+                <div onClick={appleSignOut} className="btn border border-0">
                     <Tooltip content={<div>sign out</div>}>
                         <AppleIcon/>
                     </Tooltip>
                 </div>
             ) : (
-                <a onClick={appleSignIn} className="btn text-primary link-underline link-underline-opacity-0">
+                <a onClick={appleSignIn} className="btn text-primary link-underline link-underline-opacity-0 border border-0">
                     <Tooltip content={<div>sign in</div>}>
                         <AppleIcon />
                     </Tooltip>
                 </a>
             )}
             {spotifyAccessToken ? (
-                <div onClick={spotifySignOut} className="btn">
+                <div onClick={spotifySignOut} className="btn border border-0">
                     <Tooltip content={<div>sign out</div>}>
                         <SpotifyIcon/>
                     </Tooltip>
                 </div>
             ) : (
-                <a href="/login" className="btn text-primary link-underline link-underline-opacity-0">
+                <a href="/login" className="btn text-primary link-underline link-underline-opacity-0 border border-0">
                     <Tooltip content={<div>sign in</div>}>
                         <SpotifyIcon/>
                     </Tooltip>
