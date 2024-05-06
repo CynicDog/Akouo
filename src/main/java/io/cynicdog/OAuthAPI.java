@@ -49,7 +49,7 @@ public class OAuthAPI {
         String authorization_uri = oauth2Provider.authorizeURL(
                 new OAuth2AuthorizationURL()
                         .setRedirectUri(redirectUri)
-                        .setScopes(Arrays.asList("user-read-private", "user-read-email"))
+                        .setScopes(Arrays.asList("user-read-private", "user-read-email", "playlist-read-private"))
                         .setState(state));
 
         ctx.response()

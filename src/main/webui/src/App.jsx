@@ -13,7 +13,7 @@ import theaterJS from 'theaterjs';
 import {useQuery} from "react-query";
 import DarkModeSwitch from "./component/DarkmodeSwitch.jsx";
 import {
-    fetchGreeting
+    fetchGreeting, fetchLibraryPlaylists
 } from './data/appleAPI.js';
 import {useAuth, useTheme} from "./Context.jsx";
 import BackToTopButton from "./component/BackToTopButton.jsx";
@@ -24,6 +24,7 @@ import Recommendations from "./component/apple/Recommendations.jsx";
 import {CubesIcon} from "@patternfly/react-icons";
 import AppleIcon from "../public/apple.jsx";
 import SpotifyIcon from "../public/spotify.jsx";
+import {getCurrentUserPlaylists} from "./data/spotifyAPI.js";
 
 function App() {
 
@@ -53,6 +54,13 @@ function App() {
     const toggleCardPlayer = () => {
         setIsCardPlayerOpen((prevState) => !prevState);
     };
+
+    /*TODO: temp */
+    const {data: spotifyPlaylists = [], isLoading: isSpotifyPlaylistLoading} = useQuery(
+        'spotifyPlaylists',
+        () => getCurrentUserPlaylists(spotifyAccessToken),
+        {enabled: !!spotifyAccessToken}
+    );
 
     return (
         <>
@@ -98,9 +106,10 @@ function App() {
             <div id="spotify" className="border rounded-4 p-3 my-3">
                 <h3 className="fw-lighter">Spotify</h3>
                 {spotifyAccessToken ? (
-                    <div className="">
-
+                    /*TODO: temp */
+                    <div className="embed-iframe">
                     </div>
+
                 ) : (
                     <EmptyState variant={EmptyStateVariant.lg}>
                         <EmptyStateHeader titleText="Empty state" headingLevel="h4"
