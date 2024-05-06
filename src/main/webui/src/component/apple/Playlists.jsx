@@ -3,13 +3,16 @@ import {useQuery} from 'react-query';
 import {fetchLibraryPlaylistRelationByName, fetchLibraryPlaylists} from '../../data/appleAPI.js';
 import {
     Spinner,
-    Card,
-    CardBody,
-    CardHeader,
-    CardTitle,
     List,
     ListItem,
-    CardExpandableContent, Label, Tooltip, ExpandableSection, Badge
+    Label,
+    Tooltip,
+    ExpandableSection,
+    Badge,
+    DrawerCloseButton,
+    DrawerActions,
+    DrawerHead,
+    DrawerPanelContent, Drawer, DrawerContent, DrawerContentBody, CardBody
 } from '@patternfly/react-core';
 
 function Playlists({developerToken, musicUserToken}) {
@@ -49,13 +52,15 @@ function Playlists({developerToken, musicUserToken}) {
                         displaySize="lg"
                         onToggle={onToggle}
                         isExpanded={isExpanded}>
-                        {applePlaylists.data.map(playlist => (
-                            <PlaylistCard
-                                key={playlist.id}
-                                playlist={playlist}
-                                developerToken={developerToken}
-                                musicUserToken={musicUserToken}/>
-                        ))}
+                        <List isPlain isBordered>
+                            {applePlaylists.data.map(playlist => (
+                                <PlaylistCard
+                                    key={playlist.id}
+                                    playlist={playlist}
+                                    developerToken={developerToken}
+                                    musicUserToken={musicUserToken}/>
+                            ))}
+                        </List>
                     </ExpandableSection>
                 </div>
             )}
@@ -66,9 +71,7 @@ function Playlists({developerToken, musicUserToken}) {
 const PlaylistCard = ({playlist, developerToken, musicUserToken}) => {
 
     const [isExpanded, setIsExpanded] = React.useState(false);
-    const onToggle = () => {
-        setIsExpanded(prevExpanded => !prevExpanded);
-    };
+    const drawerRef = React.useRef();
 
     const {data: tracks, isLoading: isTrackLoading} = useQuery(
         ['playlistTracks', playlist.id],
@@ -78,6 +81,13 @@ const PlaylistCard = ({playlist, developerToken, musicUserToken}) => {
             staleTime: 7_200_000 // 2 hours
         }
     );
+
+    const onExpand = () => {
+        drawerRef.current && drawerRef.current.focus();
+    };
+    const onClick = () => {
+        setIsExpanded(!isExpanded);
+    };
 
     function trimDateTime(dateTimeString) {
         const tIndex = dateTimeString.indexOf('T');
@@ -90,10 +100,12 @@ const PlaylistCard = ({playlist, developerToken, musicUserToken}) => {
     }
 
     return (
-        <Card key={playlist.id} id={playlist.id} isExpanded={isExpanded}>
-            <CardHeader id={playlist.id} onExpand={onToggle}>
-                <CardTitle>
+        <ListItem onClick={onClick} aria-expanded={isExpanded}>
+            <div className="d-flex m-1">
+                <span>
                     {playlist.attributes.name} {' '}
+                </span>
+                <span className="ms-auto">
                     <Tooltip content={<div>date added</div>}>
                         <Label isCompact>
                             {trimDateTime(playlist.attributes.dateAdded)}
@@ -104,24 +116,35 @@ const PlaylistCard = ({playlist, developerToken, musicUserToken}) => {
                             {trimDateTime(playlist.attributes.lastModifiedDate)}
                         </Label>
                     </Tooltip>
-                </CardTitle>
-            </CardHeader>
-            <CardExpandableContent>
-                {isTrackLoading ? (
-                    <div className="d-flex justify-content-center">
-                        <Spinner/>
-                    </div>
-                ) : (
-                    <CardBody>
-                        <TrackList tracks={tracks.data}/>
-                    </CardBody>
-                )}
-            </CardExpandableContent>
-        </Card>
+                </span>
+            </div>
+            <div>
+                <Drawer position="bottom" isExpanded={isExpanded} onExpand={onExpand}>
+                    <DrawerContent panelContent={<></>}>
+                        <DrawerContentBody>
+                            <DrawerPanelContent>
+                                <DrawerHead>
+                                    <span tabIndex={isExpanded ? 0 : -1} ref={drawerRef}>
+                                        {isTrackLoading ? (
+                                            <div className="d-flex justify-content-center">
+                                                <Spinner/>
+                                            </div>
+                                        ) : (
+                                            <TrackList tracks={tracks.data}/>
+                                        )}
+                                    </span>
+                                </DrawerHead>
+                            </DrawerPanelContent>
+                        </DrawerContentBody>
+                    </DrawerContent>
+                </Drawer>
+            </div>
+        </ListItem>
     );
 };
 
 const TrackList = ({tracks}) => {
+
     return (
         <List isPlain isBordered>
             {tracks.map((track, index) => (
