@@ -51,6 +51,14 @@ export const AuthProvider = ({ children }) => {
             const music = MusicKit.getInstance();
             setMusicInstance(music);
 
+            var myStation =  await music.api.music('/v1/catalog/kr/stations', {
+                'filter[identity]': 'personal',
+            });
+
+            if (!music.isQueueEmpty) {
+                await music.setQueue({ station: myStation.data.data[0].attributes.playParams.id, startPlaying: false });
+            }
+
             if (sessionStorage.getItem("MUT") === null || !music.isAuthorized) {
                 setIsAppleAuthenticated(false);
             } else {

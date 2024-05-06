@@ -15,7 +15,7 @@ import {
     DrawerPanelContent, Drawer, DrawerContent, DrawerContentBody, CardBody
 } from '@patternfly/react-core';
 
-function Playlists({developerToken, musicUserToken}) {
+function Playlists() {
 
     const [isExpanded, setIsExpanded] = React.useState(false);
     const onToggle = (_event, isExpanded) => {
@@ -24,8 +24,10 @@ function Playlists({developerToken, musicUserToken}) {
 
     const {data: applePlaylists = [], isLoading: isApplePlaylistLoading} = useQuery(
         'applePlaylists',
-        () => fetchLibraryPlaylists(developerToken, musicUserToken),
-        {enabled: !!musicUserToken}
+        () => fetchLibraryPlaylists(
+            sessionStorage.getItem("DT"),
+            sessionStorage.getItem("MUT")),
+        {enabled: !!sessionStorage.getItem("MUT")}
     );
 
     return (
@@ -57,8 +59,7 @@ function Playlists({developerToken, musicUserToken}) {
                                 <PlaylistCard
                                     key={playlist.id}
                                     playlist={playlist}
-                                    developerToken={developerToken}
-                                    musicUserToken={musicUserToken}/>
+                                />
                             ))}
                         </List>
                     </ExpandableSection>
@@ -68,7 +69,7 @@ function Playlists({developerToken, musicUserToken}) {
     );
 }
 
-const PlaylistCard = ({playlist, developerToken, musicUserToken}) => {
+const PlaylistCard = ({playlist}) => {
 
     const [isExpanded, setIsExpanded] = React.useState(false);
     const drawerRef = React.useRef();
@@ -116,10 +117,7 @@ const PlaylistCard = ({playlist, developerToken, musicUserToken}) => {
                             <DrawerPanelContent>
                                 <DrawerHead>
                                     <span tabIndex={isExpanded ? 0 : -1} ref={drawerRef}>
-                                        <PlaylistDetail
-                                            playlist={playlist}
-                                            developerToken={developerToken}
-                                            musicUserToken={musicUserToken}/>
+                                        <PlaylistDetail playlist={playlist} />
                                     </span>
                                 </DrawerHead>
                             </DrawerPanelContent>
@@ -131,11 +129,15 @@ const PlaylistCard = ({playlist, developerToken, musicUserToken}) => {
     );
 };
 
-const PlaylistDetail = ({playlist, developerToken, musicUserToken}) => {
+const PlaylistDetail = ({playlist}) => {
 
     const {data: tracks, isLoading: isTrackLoading} = useQuery(
         ['playlistTracks', playlist.id],
-        () => fetchLibraryPlaylistRelationByName(developerToken, musicUserToken, playlist.id, 'tracks'),
+        () => fetchLibraryPlaylistRelationByName(
+            sessionStorage.getItem("DT"),
+            sessionStorage.getItem("MUT"),
+            playlist.id,
+            'tracks'),
         {
             enabled: !!playlist.id,
             staleTime: 7_200_000 // 2 hours

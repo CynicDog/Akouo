@@ -17,7 +17,7 @@ import {
     Popover, TextContent, Text, TextVariants
 } from '@patternfly/react-core';
 
-function Recommendations({developerToken, musicUserToken}) {
+function Recommendations() {
     const [isExpanded, setIsExpanded] = useState(false);
     const onToggle = (_event, isExpanded) => {
         setIsExpanded(isExpanded);
@@ -25,8 +25,10 @@ function Recommendations({developerToken, musicUserToken}) {
 
     const {data: recommendations = [], isLoading: isRecommendationLoading} = useQuery(
         'recommendations',
-        () => fetchRecommendations(developerToken, musicUserToken),
-        {enabled: !!musicUserToken}
+        () => fetchRecommendations(
+            sessionStorage.getItem("DT"),
+            sessionStorage.getItem("MUT")),
+        {enabled: !!sessionStorage.getItem("MUT")}
     );
 
     return (
@@ -49,12 +51,7 @@ function Recommendations({developerToken, musicUserToken}) {
                         onToggle={onToggle}
                         isExpanded={isExpanded}>
                         {recommendations.data.map(rcm => (
-                            <RecommendationCard
-                                key={rcm.id}
-                                recommendation={rcm}
-                                developerToken={developerToken}
-                                musicUserToken={musicUserToken}
-                            />
+                            <RecommendationCard key={rcm.id} recommendation={rcm}/>
                         ))}
                     </ExpandableSection>
                 </div>
@@ -63,7 +60,7 @@ function Recommendations({developerToken, musicUserToken}) {
     );
 }
 
-const RecommendationCard = ({recommendation, developerToken, musicUserToken}) => {
+const RecommendationCard = ({recommendation}) => {
     const [isExpanded, setIsExpanded] = useState(false);
     const [selectedArtwork, setSelectedArtwork] = useState(null);
 
@@ -99,10 +96,7 @@ const RecommendationCard = ({recommendation, developerToken, musicUserToken}) =>
                                         </>
                                     }
                                     bodyContent={
-                                        <TrackListPopoverContent
-                                            relation={relation}
-                                            developerToken={developerToken}
-                                            musicUserToken={musicUserToken}/>
+                                        <TrackListPopoverContent relation={relation} />
                                     }
                                 >
                                     <>
@@ -126,14 +120,22 @@ const RecommendationCard = ({recommendation, developerToken, musicUserToken}) =>
     );
 };
 
-const TrackListPopoverContent = ({relation, developerToken, musicUserToken}) => {
+const TrackListPopoverContent = ({relation}) => {
     const {data: tracks, isLoading, isError} = useQuery(
         ['tracks', relation.id, relation.type],
         async () => {
             if (relation.type === 'albums') {
-                return fetchCatalogAlbumRelationByName(developerToken, musicUserToken, relation.id, 'tracks');
+                return fetchCatalogAlbumRelationByName(
+                    sessionStorage.getItem("DT"),
+                    sessionStorage.getItem("MUT"),
+                    relation.id,
+                    'tracks');
             } else if (relation.type === 'playlists') {
-                return fetchCatalogPlaylistRelationByName(developerToken, musicUserToken, relation.id, 'tracks');
+                return fetchCatalogPlaylistRelationByName(
+                    sessionStorage.getItem("DT"),
+                    sessionStorage.getItem("MUT"),
+                    relation.id,
+                    'tracks');
             }
         }
     );

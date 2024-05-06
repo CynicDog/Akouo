@@ -11,7 +11,7 @@ import {
     Label
 } from '@patternfly/react-core';
 
-function RecentlyPlayed({developerToken, musicUserToken}) {
+function RecentlyPlayed() {
     const [isExpanded, setIsExpanded] = React.useState(false);
 
     const onToggle = (_event, isExpanded) => {
@@ -20,8 +20,10 @@ function RecentlyPlayed({developerToken, musicUserToken}) {
 
     const {data: recentlyPlayedTracks = [], isLoading: isRecentlyPlayedLoading} = useQuery(
         'recentlyPlayedTracks',
-        () => fetchRecentlyPlayedTracks(developerToken, musicUserToken),
-        {enabled: !!musicUserToken}
+        () => fetchRecentlyPlayedTracks(
+            sessionStorage.getItem("DT"),
+            sessionStorage.getItem("MUT")),
+        {enabled: !!sessionStorage.getItem("MUT")}
     );
 
     return (

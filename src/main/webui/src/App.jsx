@@ -80,9 +80,9 @@ function App() {
                 <h3 className="fw-lighter">Apple Music</h3>
                 {isAppleAuthenticated ? (
                     <div className="">
-                        <Playlists developerToken={developerToken} musicUserToken={musicUserToken}/>
-                        <Recommendations developerToken={developerToken} musicUserToken={musicUserToken}/>
-                        <RecentlyPlayed developerToken={developerToken} musicUserToken={musicUserToken}/>
+                        <Playlists />
+                        <Recommendations />
+                        <RecentlyPlayed />
                     </div>
                 ) : (
                     <EmptyState variant={EmptyStateVariant.sm}>
