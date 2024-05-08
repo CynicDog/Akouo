@@ -12,27 +12,21 @@ import headphones from '../public/headphones.png';
 import theaterJS from 'theaterjs';
 import {useQuery} from "react-query";
 import DarkModeSwitch from "./component/DarkmodeSwitch.jsx";
-import {
-    fetchGreeting, fetchLibraryPlaylists
-} from './data/appleAPI.js';
+import {fetchGreeting} from './data/appleAPI.js';
 import {useAuth, useTheme} from "./Context.jsx";
 import BackToTopButton from "./component/BackToTopButton.jsx";
 import AuthArea from "./component/AuthArea.jsx";
-import Playlists from "./component/apple/Playlists.jsx";
-import RecentlyPlayed from "./component/apple/RecentlyPlayed.jsx";
-import Recommendations from "./component/apple/Recommendations.jsx";
 import {CubesIcon} from "@patternfly/react-icons";
 import AppleIcon from "../public/apple.jsx";
 import SpotifyIcon from "../public/spotify.jsx";
-import {getCurrentUserPlaylists} from "./data/spotifyAPI.js";
+import AppleComponentsArea from "./component/apple/AppleComponentsArea.jsx";
+import SpotifyComponentsArea from "./component/spotify/SpotifyComponentsArea.jsx";
 
 function App() {
 
-    const developerToken = sessionStorage.getItem('DT');
-    const musicUserToken = sessionStorage.getItem('MUT');
 
     const {theme} = useTheme();
-    const {isAppleAuthenticated, spotifyAccessToken} = useAuth();
+    const {isAppleAuthenticated, isSpotifyAuthenticated} = useAuth();
 
     const [isCardPlayerOpen, setIsCardPlayerOpen] = useState(true);
 
@@ -54,13 +48,6 @@ function App() {
     const toggleCardPlayer = () => {
         setIsCardPlayerOpen((prevState) => !prevState);
     };
-
-    /*TODO: temp */
-    const {data: spotifyPlaylists = [], isLoading: isSpotifyPlaylistLoading} = useQuery(
-        'spotifyPlaylists',
-        () => getCurrentUserPlaylists(spotifyAccessToken),
-        {enabled: !!spotifyAccessToken}
-    );
 
     return (
         <>
@@ -84,18 +71,17 @@ function App() {
                 </FlexItem>
             </Flex>
 
+            {/* Apple Components Area */}
             <div id="apple-music" className="border rounded-4 p-3 my-3">
                 <h3 className="fw-lighter">Apple Music</h3>
                 {isAppleAuthenticated ? (
-                    <div className="">
-                        <Playlists />
-                        <Recommendations />
-                        <RecentlyPlayed />
-                    </div>
+                    <AppleComponentsArea />
                 ) : (
                     <EmptyState variant={EmptyStateVariant.sm}>
-                        <EmptyStateHeader titleText="Empty state" headingLevel="h4"
-                                          icon={<EmptyStateIcon icon={CubesIcon}/>}/>
+                        <EmptyStateHeader
+                            titleText="Empty state"
+                            headingLevel="h4"
+                            icon={<EmptyStateIcon icon={CubesIcon}/>} />
                         <EmptyStateBody>
                             sign in to Apple Music first ( <AppleIcon/> )
                         </EmptyStateBody>
@@ -103,17 +89,17 @@ function App() {
                 )}
             </div>
 
+            {/* Spotify Components Area */}
             <div id="spotify" className="border rounded-4 p-3 my-3">
                 <h3 className="fw-lighter">Spotify</h3>
-                {spotifyAccessToken ? (
-                    /*TODO: temp */
-                    <div className="embed-iframe">
-                    </div>
-
+                {isSpotifyAuthenticated ? (
+                    <SpotifyComponentsArea />
                 ) : (
                     <EmptyState variant={EmptyStateVariant.lg}>
-                        <EmptyStateHeader titleText="Empty state" headingLevel="h4"
-                                          icon={<EmptyStateIcon icon={CubesIcon}/>}/>
+                        <EmptyStateHeader
+                            titleText="Empty state"
+                            headingLevel="h4"
+                            icon={<EmptyStateIcon icon={CubesIcon}/>} />
                         <EmptyStateBody>
                             sign in to Spotify first ( <SpotifyIcon/> )
                         </EmptyStateBody>

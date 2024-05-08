@@ -25,7 +25,7 @@ const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
     const [isAppleAuthenticated, setIsAppleAuthenticated] = useState(false);
-    const [spotifyAccessToken, setSpotifyAccessToken] = useState(null);
+    const [isSpotifyAuthenticated, setIsSpotifyAuthenticated] = useState(null);
     const [musicInstance, setMusicInstance] = useState(null);
 
     useEffect(() => {
@@ -33,7 +33,9 @@ export const AuthProvider = ({ children }) => {
         sessionStorage.setItem("DT", '{DEVELOPER_TOKEN}');
 
         const token = getSpotifyAccessTokenFromCookie();
-        setSpotifyAccessToken(token);
+
+        sessionStorage.setItem("ACCESS_TOKEN", token);
+        setIsSpotifyAuthenticated(true);
 
         configureMusicKit();
     }, []);
@@ -92,18 +94,17 @@ export const AuthProvider = ({ children }) => {
             }
         }
         sessionStorage.removeItem('MUT');
-        // window.location.reload();
     };
 
     const handleSpotifySignOut = () => {
         removeSpotifyAccessTokenCookie();
-        setSpotifyAccessToken(null);
-        // window.location.reload();
+        sessionStorage.removeItem("ACCESS_TOKEN");
+        setIsSpotifyAuthenticated(null);
     };
 
     const value = {
         isAppleAuthenticated,
-        spotifyAccessToken,
+        isSpotifyAuthenticated,
         musicInstance,
         handleAppleSignIn,
         handleAppleSignOut,

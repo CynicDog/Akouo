@@ -4,7 +4,7 @@ import {useAuth} from "../Context.jsx";
 import {Tooltip} from "@patternfly/react-core";
 
 const AuthArea = () => {
-    const { isAppleAuthenticated, spotifyAccessToken, handleAppleSignIn, handleAppleSignOut, handleSpotifySignOut } = useAuth();
+    const { isAppleAuthenticated, isSpotifyAuthenticated, handleAppleSignIn, handleAppleSignOut, handleSpotifySignOut } = useAuth();
 
     const appleSignOut = () => {
         handleAppleSignOut();
@@ -33,7 +33,7 @@ const AuthArea = () => {
                     </Tooltip>
                 </a>
             )}
-            {spotifyAccessToken ? (
+            {isSpotifyAuthenticated ? (
                 <div onClick={spotifySignOut} className="btn border border-0">
                     <Tooltip content={<div>sign out</div>}>
                         <SpotifyIcon/>
