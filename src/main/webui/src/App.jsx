@@ -21,14 +21,12 @@ import AppleIcon from "../public/apple.jsx";
 import SpotifyIcon from "../public/spotify.jsx";
 import AppleComponentsArea from "./component/apple/AppleComponentsArea.jsx";
 import SpotifyComponentsArea from "./component/spotify/SpotifyComponentsArea.jsx";
+import AppleMusicPlayer from "./component/apple/AppleMusicPlayer.jsx";
 
 function App() {
 
-
     const {theme} = useTheme();
     const {isAppleAuthenticated, isSpotifyAuthenticated} = useAuth();
-
-    const [isCardPlayerOpen, setIsCardPlayerOpen] = useState(true);
 
     const {data: message, isLoading: isMessageLoading, error: messageError} = useQuery(
         'greeting',
@@ -44,10 +42,6 @@ function App() {
             .addScene(`Brand: ${message}`, 1000)
             .play();
     }, [message, isMessageLoading]);
-
-    const toggleCardPlayer = () => {
-        setIsCardPlayerOpen((prevState) => !prevState);
-    };
 
     return (
         <>
@@ -107,18 +101,8 @@ function App() {
                 )}
             </div>
 
-            {isAppleAuthenticated && (
-                <>
-                    <div id="card-toggler" className={isCardPlayerOpen ? '' : 'hidden'} onClick={toggleCardPlayer}>
-                        {isCardPlayerOpen ? <span className='fw-lighter'>hide card player</span> : <a>🎧</a>}
-                    </div>
-                    {isCardPlayerOpen && (
-                        <apple-music-card-player theme={theme}/>
-                    )}
-                </>
-            )}
-
-            <BackToTopButton/>
+            {/*<AppleMusicPlayer />*/}
+            <BackToTopButton />
         </>
     );
 }
