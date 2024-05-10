@@ -70,8 +70,6 @@ function Playlists() {
 
 const PlaylistCard = ({playlist}) => {
 
-    const {musicInstance} = useAuth();
-
     const [isExpanded, setIsExpanded] = React.useState(false);
     const drawerRef = React.useRef();
 
@@ -158,28 +156,24 @@ const PlaylistDetail = ({playlist}) => {
                                                     width="250"/>
                     </div>
                     <div className="col-lg-8">
-                        <List isPlain isBordered>
+                        <List isPlain isBordered style={{ height: '250px', overflowY: 'auto' }}>
                             {tracks.data.map((track, index) => (
-                                <ListItem className="row fw-lighter" key={index}>
-                                    <div className="col-lg-8 fw-light">
+                                <ListItem className="fw-lighter" key={index}>
+                                    <div className="fw-light">
                                         {track.attributes.name} {' '}
                                         <Label isCompact>
                                             {track.attributes.genreNames.join(",")}
-                                        </Label>
-                                    </div>
-                                    <div className="col-lg-4">
-                                        <div className="d-flex justify-content-end">
-                                            <Tooltip content={<div>{track.attributes.artistName}</div>}>
-                                                <Label textMaxWidth="100px" isCompact>
-                                                    {track.attributes.artistName}
-                                                </Label>
-                                            </Tooltip>
-                                            <Tooltip content={<div>{track.attributes.albumName}</div>}>
-                                                <Label isCompact textMaxWidth="100px" color="blue">
-                                                    {track.attributes.albumName}
-                                                </Label>
-                                            </Tooltip>
-                                        </div>
+                                        </Label>{' '}
+                                        <Tooltip content={<div>{track.attributes.artistName}</div>}>
+                                            <Label textMaxWidth="100px" isCompact>
+                                                {track.attributes.artistName}
+                                            </Label>
+                                        </Tooltip>{' '}
+                                        <Tooltip content={<div>{track.attributes.albumName}</div>}>
+                                            <Label isCompact textMaxWidth="100px" color="blue">
+                                                {track.attributes.albumName}
+                                            </Label>
+                                        </Tooltip>
                                     </div>
                                 </ListItem>
                             ))}
