@@ -16,8 +16,8 @@ public class UserRepository {
         return query.getResultList();
     }
 
-    public User findByMusicUserToken(String musicUserToken) {
-        return em.find(User.class, musicUserToken);
+    public User findByStationId(String stationId) {
+        return em.find(User.class, stationId);
     }
 
     public void save(User user) {

@@ -1,6 +1,7 @@
 import './App.css';
 import React, {useEffect, useState} from 'react';
 import {
+    Avatar,
     Brand, EmptyState, EmptyStateBody, EmptyStateHeader, EmptyStateIcon, EmptyStateVariant,
     Flex,
     FlexItem,
@@ -26,7 +27,7 @@ import AppleMusicPlayer from "./component/apple/AppleMusicPlayer.jsx";
 function App() {
 
     const {theme} = useTheme();
-    const {isAppleAuthenticated, isSpotifyAuthenticated} = useAuth();
+    const {isAppleAuthenticated, isSpotifyAuthenticated, appleUsername, spotifyUsername, spotifyProfilePicture} = useAuth();
 
     const {data: message, isLoading: isMessageLoading, error: messageError} = useQuery(
         'greeting',
@@ -67,7 +68,11 @@ function App() {
 
             {/* Apple Components Area */}
             <div id="apple-music" className="border rounded-4 p-3 my-3">
-                <h3 className="fw-lighter">Apple Music</h3>
+                <div className="d-flex justify-content-between fw-lighter">
+                    <span className="fs-3">Apple Music</span>
+                    {isAppleAuthenticated &&
+                        <span>{appleUsername}</span>}
+                </div>
                 {isAppleAuthenticated ? (
                     <AppleComponentsArea />
                 ) : (
@@ -85,7 +90,15 @@ function App() {
 
             {/* Spotify Components Area */}
             <div id="spotify" className="border rounded-4 p-3 my-3">
-                <h3 className="fw-lighter">Spotify</h3>
+                <div className="d-flex justify-content-between fw-lighter">
+                    <span className="fs-3">Spotify</span>
+                    {isSpotifyAuthenticated &&
+                        <div>
+                            <span className="mx-3">{spotifyUsername}</span>
+                            <Avatar src={spotifyProfilePicture} alt="profile" />
+                        </div>
+                    }
+                </div>
                 {isSpotifyAuthenticated ? (
                     <SpotifyComponentsArea />
                 ) : (

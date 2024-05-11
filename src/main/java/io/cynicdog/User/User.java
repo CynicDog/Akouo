@@ -1,5 +1,6 @@
 package io.cynicdog.User;
 
+import io.cynicdog.util.Type;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -16,9 +17,6 @@ public class User {
     @Column(name="station_name")
     private String stationName;
 
-    @Column(name = "username")
-    private String username;
-
     private LocalDateTime createdAt;
 
     @ElementCollection
@@ -29,13 +27,15 @@ public class User {
     @Column(name = "sign_in_at")
     private List<LocalDateTime> signInHistory = new ArrayList<>();
 
+    @Enumerated(EnumType.STRING)
+    private Type type;
+
     public User() {
     }
 
-    public User(String stationId, String stationName, String username) {
+    public User(String stationId, String stationName) {
         this.stationId = stationId;
         this.stationName = stationName;
-        this.username = username;
     }
 
     public String getStationId() {
@@ -46,12 +46,12 @@ public class User {
         this.stationId = musicUserToken;
     }
 
-    public String getUsername() {
-        return username;
+    public String getStationName() {
+        return stationName;
     }
 
-    public void setUsername(String username) {
-        this.username = username;
+    public void setStationName(String stationName) {
+        this.stationName = stationName;
     }
 
     public LocalDateTime getCreatedAt() {
@@ -68,5 +68,13 @@ public class User {
 
     public List<LocalDateTime> getSignInHistory() {
         return signInHistory;
+    }
+
+    public Type getType() {
+        return type;
+    }
+
+    public void setType(Type type) {
+        this.type = type;
     }
 }

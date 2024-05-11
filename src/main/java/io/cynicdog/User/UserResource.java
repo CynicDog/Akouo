@@ -1,5 +1,6 @@
 package io.cynicdog.User;
 
+import io.cynicdog.util.Type;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.*;
@@ -26,15 +27,17 @@ public class UserResource {
     @POST
     @Path("/sign-in")
     @Transactional
-    public String signIn(@HeaderParam("STATION_ID") String stationId, Map<String, String> payload) {
-        User user = userRepository.findByMusicUserToken(stationId);
+    public String signIn(@QueryParam("type") String type,  Map<String, String> payload) {
+
+        User user = userRepository.findByStationId(payload.get("stationId"));
 
         if (user == null) {
-            String username = generateUniqueUsername();
 
-            user = new User(stationId, payload.get("stationName"), username);
+            user = new User(payload.get("stationId"), payload.get("stationName"));
+
             user.setCreatedAt(LocalDateTime.now());
             user.addSignInHistory(LocalDateTime.now());
+            user.setType(Type.valueOf(type.toUpperCase()));
 
             userRepository.save(user);
         } else {
@@ -42,11 +45,6 @@ public class UserResource {
             userRepository.update(user);
         }
 
-        return user.getUsername();
-    }
-
-    private String generateUniqueUsername() {
-
-        return "USER_" + UUID.randomUUID().toString().substring(0, 8);
+        return user.getStationName();
     }
 }

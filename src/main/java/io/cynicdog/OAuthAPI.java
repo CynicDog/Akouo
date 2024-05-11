@@ -3,6 +3,7 @@ package io.cynicdog;
 import io.vertx.core.MultiMap;
 import io.vertx.core.Vertx;
 import io.vertx.core.http.Cookie;
+import io.vertx.core.json.JsonObject;
 import io.vertx.ext.auth.oauth2.OAuth2Auth;
 import io.vertx.ext.auth.oauth2.OAuth2AuthorizationURL;
 import io.vertx.ext.auth.oauth2.OAuth2Options;
@@ -95,12 +96,38 @@ public class OAuthAPI {
                                     .putHeader("Authorization", "Bearer " + accessToken)
                                     .send(meResponse -> {
                                         if (meResponse.succeeded()) {
+
+                                            var meResponseBody = meResponse.result().bodyAsJsonObject();
+
+                                            WebClient.create(ctx.vertx())
+                                                    // TODO: Configure hardcoded location
+                                                    .post(8080, "localhost", "/user/sign-in?type=spotify")
+                                                    .sendJsonObject(new JsonObject()
+                                                            .put("stationId", meResponseBody.getString("id"))
+                                                            .put("stationName", meResponseBody.getString("display_name")));
+
                                             logger.info(meResponse.result().bodyAsJsonObject().encodePrettily());
+
+                                            var spotifyUsername = meResponseBody.getString("display_name");
+                                            var spotifyProfileImages = meResponseBody.getJsonArray("images");
+                                            String spotifyProfilePicture = null;
+
+                                            if (spotifyProfileImages != null && !spotifyProfileImages.isEmpty()) {
+                                                spotifyProfilePicture = spotifyProfileImages.getJsonObject(0).getString("url");
+                                            }
 
                                             ctx.response()
                                                     .setStatusCode(302)
                                                     .putHeader("Location", "/")
-                                                    .addCookie(Cookie.cookie("access_token", accessToken))
+                                                    .addCookie(Cookie.cookie(
+                                                            "access_token", accessToken)
+                                                    )
+                                                    .addCookie(Cookie.cookie(
+                                                            "spotify_username", spotifyUsername.replaceAll("\\s", "_"))
+                                                    )
+                                                    .addCookie(Cookie.cookie(
+                                                            "spotify_profile_picture", spotifyProfilePicture)
+                                                    )
                                                     .end();
                                         } else {
                                             logger.info(meResponse.cause().getMessage());
