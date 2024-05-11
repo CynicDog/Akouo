@@ -25,7 +25,9 @@ public class RouterRegistry {
     public void register (@Observes Router router,
                           @ConfigProperty(name = "spotify.client-id") String CLIENT_ID,
                           @ConfigProperty(name = "spotify.client-secret") String CLIENT_SECRET,
-                          @ConfigProperty(name = "spotify.redirect-uri") String redirectUri) {
+                          @ConfigProperty(name = "spotify.redirect-uri") String redirectUri,
+                          @ConfigProperty(name = "host") String host,
+                          @ConfigProperty(name = "port") int port) {
 
         // register logger
         router.route().handler(ctx -> {
@@ -33,7 +35,7 @@ public class RouterRegistry {
             ctx.next();
         });
 
-        var OAuthAPI = new OAuthAPI(vertx, CLIENT_ID, CLIENT_SECRET, redirectUri);
+        var OAuthAPI = new OAuthAPI(vertx, host, port, CLIENT_ID, CLIENT_SECRET, redirectUri);
 
         router.get("/login").handler(OAuthAPI::login);
         router.get("/callback").handler(OAuthAPI::callback);

@@ -23,13 +23,20 @@ public class OAuthAPI {
     public static String stateKey = "STATE";
 
     final Vertx vertx;
+    final String host;
+    final int port;
+
     final String CLIENT_ID;
     final String CLIENT_SECRET;
     final String redirectUri;
     final OAuth2Options credentials;
 
-    public OAuthAPI(Vertx vertx, String CLIENT_ID, String CLIENT_SECRET, String redirectUri) {
+    public OAuthAPI(Vertx vertx,  String host, int port, String CLIENT_ID, String CLIENT_SECRET, String redirectUri) {
+
         this.vertx = vertx;
+        this.host = host;
+        this.port = port;
+
         this.CLIENT_ID = CLIENT_ID;
         this.CLIENT_SECRET = CLIENT_SECRET;
         this.redirectUri = redirectUri;
@@ -100,8 +107,7 @@ public class OAuthAPI {
                                             var meResponseBody = meResponse.result().bodyAsJsonObject();
 
                                             WebClient.create(ctx.vertx())
-                                                    // TODO: Configure hardcoded location
-                                                    .post(8080, "localhost", "/user/sign-in?type=spotify")
+                                                    .post(port, host, "/user/sign-in?type=spotify")
                                                     .sendJsonObject(new JsonObject()
                                                             .put("stationId", meResponseBody.getString("id"))
                                                             .put("stationName", meResponseBody.getString("display_name")));

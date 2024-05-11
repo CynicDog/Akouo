@@ -17,12 +17,12 @@ This project demonstrates deploying a Quarkus-based Vert.x application to Google
 ### Prerequisites
 - Configure Kubernetes node port and Spotify credentials in `application.properties` file as follows:
 ```properties
-quarkus.kubernetes.node-port={service_port}
-
+%prod.host={minikube_ip}
+%prod.port={service_port}
+quarkus.kubernetes.node-port={port}
+...
 spotify.client-id={SPOTIFY_APP_CLIENT_ID}
 spotify.client-secret={SPOTIFY_APP_CLIENT_SECRET}
-
-%prod.spotify.redirect-uri=http://{minikube_ip}:{service_port}/callback
 ```
 
 - Ensure Minikube is installed and initialized as VM, with the driver of qemu:  
