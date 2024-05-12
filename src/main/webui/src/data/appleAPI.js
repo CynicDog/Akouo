@@ -68,7 +68,7 @@ export const fetchCatalogPlaylistRelationByName = async (developerToken, musicUs
 
 // Fetch a library playlist’s relationship by using its identifier.
 export const fetchLibraryPlaylistRelationByName = async (developerToken, musicUserToken, id, relation) => {
-    const url = `https://api.music.apple.com/v1/me/library/playlists/${String(id)}/${relation}`;
+    const url = `https://api.music.apple.com/v1/me/library/playlists/${String(id)}/${relation}?include=catalog`;
     return fetchData(url, developerToken, musicUserToken);
 }
 

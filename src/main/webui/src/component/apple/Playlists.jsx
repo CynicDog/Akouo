@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useRef, useState} from 'react';
 import {useQuery} from 'react-query';
 import {fetchLibraryPlaylistRelationByName, fetchLibraryPlaylists} from '../../data/appleAPI.js';
 import {
@@ -12,11 +12,12 @@ import {
     DrawerHead,
     DrawerPanelContent, Drawer, DrawerContent, DrawerContentBody
 } from '@patternfly/react-core';
-import {useAuth} from "../../Context.jsx";
+import SearchModal from "./SearchModal.jsx";
+import SpotifyIcon from "../../../public/spotify.jsx";
 
 function Playlists() {
 
-    const [isExpanded, setIsExpanded] = React.useState(false);
+    const [isExpanded, setIsExpanded] = useState(false);
     const onToggle = (_event, isExpanded) => {
         setIsExpanded(isExpanded);
     };
@@ -70,8 +71,8 @@ function Playlists() {
 
 const PlaylistCard = ({playlist}) => {
 
-    const [isExpanded, setIsExpanded] = React.useState(false);
-    const drawerRef = React.useRef();
+    const [isExpanded, setIsExpanded] = useState(false);
+    const drawerRef = useRef();
 
     const onExpand = () => {
         drawerRef.current && drawerRef.current.focus();
@@ -97,16 +98,9 @@ const PlaylistCard = ({playlist}) => {
                     {playlist.attributes.name}
                 </Label>
                 <span className="ms-auto my-2">
-                    <Tooltip content={<div>date added</div>}>
-                        <Label isCompact>
-                            {trimDateTime(playlist.attributes.dateAdded)}
-                        </Label>
-                    </Tooltip>{' '}
-                    <Tooltip content={<div>last modified</div>}>
-                        <Label isCompact color="gold">
-                            {trimDateTime(playlist.attributes.lastModifiedDate)}
-                        </Label>
-                    </Tooltip>
+                    <Label isCompact>
+                        {trimDateTime(playlist.attributes.dateAdded)}
+                    </Label>
                 </span>
             </div>
             <div>
@@ -130,6 +124,14 @@ const PlaylistCard = ({playlist}) => {
 
 const PlaylistDetail = ({playlist}) => {
 
+    const [isModalOpen, setIsModalOpen] = React.useState(false);
+    const handleModalToggle = _event => {
+        setIsModalOpen(prevIsModalOpen => !prevIsModalOpen);
+    };
+    const handleWizardToggle = () => {
+        setIsModalOpen(prevIsModalOpen => !prevIsModalOpen);
+    };
+
     const {data: tracks, isLoading: isTrackLoading} = useQuery(
         ['playlistTracks', playlist.id],
         () => fetchLibraryPlaylistRelationByName(
@@ -150,36 +152,56 @@ const PlaylistDetail = ({playlist}) => {
                     <Spinner/>
                 </div>
             ) : (
-                <div className="row">
-                    <div className="col-lg-4">
-                        <apple-music-artwork-lockup type="playlist" content-id={playlist.attributes.playParams.globalId}
-                                                    width="250"/>
+                <>
+                    <div className="row">
+                        <div className="col-lg-4">
+                            <apple-music-artwork-lockup type="playlist"
+                                                        content-id={playlist.attributes.playParams.globalId}
+                                                        width="250"/>
+                        </div>
+                        <div className="col-lg-8">
+                            <List isPlain isBordered style={{height: '250px', overflowY: 'auto'}}>
+                                {tracks.data.map((track, index) => (
+                                    <ListItem className="fw-lighter" key={index}>
+                                        <div className="fw-light">
+                                            {track.attributes.name} {' '}
+                                            <Label isCompact>
+                                                {track.attributes.genreNames.join(",")}
+                                            </Label>{' '}
+                                            <Tooltip content={<div>{track.attributes.artistName}</div>}>
+                                                <Label textMaxWidth="100px" isCompact>
+                                                    {track.attributes.artistName}
+                                                </Label>
+                                            </Tooltip>{' '}
+                                            <Tooltip content={<div>{track.attributes.albumName}</div>}>
+                                                <Label isCompact textMaxWidth="100px" color="blue">
+                                                    {track.attributes.albumName}
+                                                </Label>
+                                            </Tooltip>
+                                        </div>
+                                    </ListItem>
+                                ))}
+                            </List>
+                        </div>
                     </div>
-                    <div className="col-lg-8">
-                        <List isPlain isBordered style={{ height: '250px', overflowY: 'auto' }}>
-                            {tracks.data.map((track, index) => (
-                                <ListItem className="fw-lighter" key={index}>
-                                    <div className="fw-light">
-                                        {track.attributes.name} {' '}
-                                        <Label isCompact>
-                                            {track.attributes.genreNames.join(",")}
-                                        </Label>{' '}
-                                        <Tooltip content={<div>{track.attributes.artistName}</div>}>
-                                            <Label textMaxWidth="100px" isCompact>
-                                                {track.attributes.artistName}
-                                            </Label>
-                                        </Tooltip>{' '}
-                                        <Tooltip content={<div>{track.attributes.albumName}</div>}>
-                                            <Label isCompact textMaxWidth="100px" color="blue">
-                                                {track.attributes.albumName}
-                                            </Label>
-                                        </Tooltip>
-                                    </div>
-                                </ListItem>
-                            ))}
-                        </List>
+                    <div className="d-flex">
+                        <div className="ms-auto">
+                            <Label
+                                icon={<SpotifyIcon />}
+                                variant="outline"
+                                onClick={() => handleModalToggle()}
+                                className="m-2">
+                                Find in Spotify
+                            </Label>
+                        </div>
+                        <SearchModal
+                            tracks={tracks.data}
+                            isModalOpen={isModalOpen}
+                            handleModalToggle={handleModalToggle}
+                            handleWizardToggle={handleWizardToggle}
+                        />
                     </div>
-                </div>
+                </>
             )}
         </>
     );
