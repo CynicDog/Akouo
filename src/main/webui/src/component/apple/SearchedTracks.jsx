@@ -26,11 +26,6 @@ const SearchedTracks = ({ tracks, setSearchResults }) => {
             return await searchForItem(
                 sessionStorage.getItem("ACCESS_TOKEN"),
                 track.relationships?.catalog?.data[0]?.attributes?.isrc,
-                track.attributes.name,
-                track.attributes.albumName,
-                track.attributes.artistName,
-                track.attributes.releaseDate,
-                track.attributes.genreNames
             );
         }));
         setSearchResults(searchResults);
@@ -47,17 +42,23 @@ const SearchedTracks = ({ tracks, setSearchResults }) => {
                 <List component={ListComponent.ol} type={OrderType.number}>
                     {searchResults.map((result, index) => (
                         <ListItem key={index}>
-                            {result.tracks.items[0].name}{' '}
-                            <Tooltip content={<div>{result.tracks.items[0]?.album?.name}</div>}>
-                                <Label isCompact textMaxWidth="7ch">
-                                    {result.tracks.items[0].album.name}
-                                </Label>
-                            </Tooltip>{' '}
-                            <Tooltip content={<div>{result.tracks.items[0]?.artists[0]?.name}</div>}>
-                                <Label isCompact textMaxWidth="7ch">
-                                    {result.tracks.items[0]?.artists[0]?.name}
-                                </Label>
-                            </Tooltip>
+                            {result.tracks.items.length > 0 && (
+                                <>
+                                    <span className="fw-light">
+                                        {result.tracks.items[0].name}{' '}
+                                    </span>
+                                    <Tooltip content={<div>{result.tracks.items[0]?.album?.name}</div>}>
+                                        <Label isCompact textMaxWidth="7ch">
+                                            {result.tracks.items[0].album.name}
+                                        </Label>
+                                    </Tooltip>{' '}
+                                    <Tooltip content={<div>{result.tracks.items[0]?.artists[0]?.name}</div>}>
+                                        <Label isCompact textMaxWidth="7ch">
+                                            {result.tracks.items[0]?.artists[0]?.name}
+                                        </Label>
+                                    </Tooltip>
+                                </>
+                            )}
                         </ListItem>
                     ))}
                 </List>

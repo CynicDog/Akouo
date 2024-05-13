@@ -22,6 +22,7 @@ const SearchModal = ({tracks, isModalOpen, handleModalToggle, handleWizardToggle
                 showClose={false}
                 isOpen={isModalOpen}
                 onClose={handleModalToggle}
+                width="1300px"
                 hasNoBodyWrapper>
                 <Wizard
                     height={400}
@@ -36,14 +37,16 @@ const SearchModal = ({tracks, isModalOpen, handleModalToggle, handleWizardToggle
                     onClose={handleWizardToggle}>
                     <WizardStep
                         id="with-wizard-step-1"
-                        name="Validate Apple Music Tracks">
+                        name="Find Apple Music Tracks in Spotify">
                         <div className="row">
                             <div className="col-lg-6">
-                                <div className="fs-5 fw-lighter">Apple Music Tracks</div>
+                                <div className="fs-4 fw-lighter mb-3">Apple Music Tracks</div>
                                 <List component={ListComponent.ol} type={OrderType.number}>
                                     {tracks.map((track, index) => (
                                         <ListItem key={index}>
-                                            {track.attributes.name}{' '}
+                                            <span className="fw-light">
+                                                {track.attributes.name}{' '}
+                                            </span>
                                             <Tooltip content={<div>{track.attributes.albumName}</div>}>
                                                 <Label isCompact textMaxWidth="7ch">
                                                     {track.attributes.albumName}
@@ -59,7 +62,7 @@ const SearchModal = ({tracks, isModalOpen, handleModalToggle, handleWizardToggle
                                 </List>
                             </div>
                             <div className="col-lg-6">
-                                <div className="fs-5 fw-lighter">Searched Tracks in Spotify</div>
+                                <div className="fs-4 fw-lighter mb-3">Tracks searched in Spotify</div>
                                 <SearchedTracks tracks={tracks} setSearchResults={setSearchResults}/>
                             </div>
                         </div>
