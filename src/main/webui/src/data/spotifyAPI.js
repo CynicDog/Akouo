@@ -5,7 +5,7 @@ export const getCurrentUserPlaylists = async (accessToken) => {
 };
 
 // Search tracks by ISRC code
-export const searchForItem = async (accessToken, isrc, trackName, albumName, artistName, releaseDate, genreNames) => {
+export const searchForItem = async (accessToken, isrc) => {
     const url = `https://api.spotify.com/v1/search?type=track&q=isrc%3A${isrc}&limit=1`
     return fetchData(url, accessToken);
 }

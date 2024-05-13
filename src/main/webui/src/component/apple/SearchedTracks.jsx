@@ -1,6 +1,7 @@
 import { useQuery } from "react-query";
 import { searchForItem } from "../../data/spotifyAPI.js";
 import {
+    Badge, HelperText, HelperTextItem,
     Label,
     List,
     ListComponent,
@@ -28,7 +29,7 @@ const SearchedTracks = ({ tracks, setSearchResults }) => {
                 track.relationships?.catalog?.data[0]?.attributes?.isrc,
             );
         }));
-        setSearchResults(searchResults);
+        setSearchResults(searchResults.filter(result => result.tracks.items.length > 0));
         return searchResults;
     };
 
@@ -42,7 +43,7 @@ const SearchedTracks = ({ tracks, setSearchResults }) => {
                 <List component={ListComponent.ol} type={OrderType.number}>
                     {searchResults.map((result, index) => (
                         <ListItem key={index}>
-                            {result.tracks.items.length > 0 && (
+                            {result.tracks.items.length > 0 ? (
                                 <>
                                     <span className="fw-light">
                                         {result.tracks.items[0].name}{' '}
@@ -58,6 +59,12 @@ const SearchedTracks = ({ tracks, setSearchResults }) => {
                                         </Label>
                                     </Tooltip>
                                 </>
+                            ): (
+                                <HelperText>
+                                    <HelperTextItem variant="error" hasIcon>
+                                        not found
+                                    </HelperTextItem>
+                                </HelperText>
                             )}
                         </ListItem>
                     ))}

@@ -107,7 +107,7 @@ const PlaylistCard = ({playlist}) => {
                 <Drawer position="bottom" isExpanded={isExpanded} onExpand={onExpand}>
                     <DrawerContent panelContent={<></>}>
                         <DrawerContentBody>
-                            <DrawerPanelContent className="m-2 p-3">
+                            <DrawerPanelContent className="m-2">
                                 <DrawerHead>
                                     <span tabIndex={isExpanded ? 0 : -1} ref={drawerRef}>
                                         <PlaylistDetail playlist={playlist}/>
@@ -190,11 +190,12 @@ const PlaylistDetail = ({playlist}) => {
                                 icon={<SpotifyIcon />}
                                 variant="outline"
                                 onClick={() => handleModalToggle()}
-                                className="m-2">
+                                className="mt-5">
                                 Find in Spotify
                             </Label>
                         </div>
                         <SearchModal
+                            playlist={playlist}
                             tracks={tracks.data}
                             isModalOpen={isModalOpen}
                             handleModalToggle={handleModalToggle}
