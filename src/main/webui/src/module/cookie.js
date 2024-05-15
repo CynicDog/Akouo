@@ -17,6 +17,14 @@ export const getSpotifyUsernameFromCookie = () => {
     return null;
 };
 
+export const getSpotifyUserIdFromCookie = () => {
+    const cookie = document.cookie.split('; ').find(row => row.startsWith('spotify_user_id='));
+    if (cookie) {
+        return cookie.split('=')[1];
+    }
+    return null;
+}
+
 export const getSpotifyProfilePictureFromCookie = () => {
     const cookie = document.cookie.split('; ').find(row => row.startsWith('spotify_profile_picture='));
     if (cookie) {
@@ -32,6 +40,10 @@ export const removeSpotifyAccessTokenCookie = () => {
 export const removeSpotifyUsernameCookie = () => {
     document.cookie = 'spotify_username=;';
 };
+
+export const removeSpotifyUserIdCookie = () => {
+    document.cookie = 'spotify_user_id=;'
+}
 
 export const removeSpotifyProfilePictureCooke = () => {
     document.cookie = 'spotify_profile_picture=;';

@@ -14,6 +14,7 @@ import {
 } from '@patternfly/react-core';
 import SearchModal from "./SearchModal.jsx";
 import SpotifyIcon from "../../../public/spotify.jsx";
+import {useAuth} from "../../Context.jsx";
 
 function Playlists() {
 
@@ -122,6 +123,8 @@ const PlaylistCard = ({playlist}) => {
 
 const PlaylistDetail = ({playlist}) => {
 
+    const {isSpotifyAuthenticated} = useAuth();
+
     const [isModalOpen, setIsModalOpen] = React.useState(false);
     const handleModalToggle = _event => {
         setIsModalOpen(prevIsModalOpen => !prevIsModalOpen);
@@ -178,24 +181,26 @@ const PlaylistDetail = ({playlist}) => {
                             </List>
                         </div>
                     </div>
-                    <div className="d-flex">
-                        <div className="ms-auto">
-                            <Label
-                                icon={<SpotifyIcon />}
-                                variant="outline"
-                                onClick={() => handleModalToggle()}
-                                className="mt-5">
-                                Find in Spotify
-                            </Label>
+                    {isSpotifyAuthenticated && (
+                        <div className="d-flex">
+                            <div className="ms-auto">
+                                <Label
+                                    icon={<SpotifyIcon />}
+                                    variant="outline"
+                                    onClick={() => handleModalToggle()}
+                                    className="mt-5">
+                                    Find in Spotify
+                                </Label>
+                            </div>
+                            <SearchModal
+                                playlist={playlist}
+                                tracks={tracks.data}
+                                isModalOpen={isModalOpen}
+                                handleModalToggle={handleModalToggle}
+                                handleWizardToggle={handleWizardToggle}
+                            />
                         </div>
-                        <SearchModal
-                            playlist={playlist}
-                            tracks={tracks.data}
-                            isModalOpen={isModalOpen}
-                            handleModalToggle={handleModalToggle}
-                            handleWizardToggle={handleWizardToggle}
-                        />
-                    </div>
+                    )}
                 </>
             )}
         </>

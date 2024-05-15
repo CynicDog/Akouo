@@ -1,26 +1,66 @@
 import {
-    Button, Checkbox, HelperText, HelperTextItem, Label, List, ListComponent, ListItem,
+    Button,
+    Checkbox, HelperText, HelperTextItem, Label, List, ListComponent, ListItem,
     Modal,
-    ModalVariant, OrderType, Radio,
-    SimpleList,
-    SimpleListItem, TextInput, Tooltip, ValidatedOptions,
-    Wizard,
+    ModalVariant, OrderType,
+    TextInput, Tooltip, useWizardContext,
+    Wizard, WizardFooter, WizardFooterWrapper,
     WizardHeader,
     WizardStep
 } from "@patternfly/react-core";
 import React, {useState} from "react";
 import SearchedTracks from "./SearchedTracks.jsx";
+import {useMutation} from "react-query";
+import {createPlaylist} from "../../data/spotifyAPI.js";
+import {useAuth} from "../../Context.jsx";
+import PlaylistDetail from "../spotify/PlaylistDetail.jsx";
 
 const SearchModal = ({playlist, tracks, isModalOpen, handleModalToggle, handleWizardToggle}) => {
 
+    const {spotifyUserId} = useAuth();
     const [searchResults, setSearchResults] = useState([]);
     const [playlistName, setPlaylistName] = useState(playlist.attributes.name);
     const [playlistDescription, setPlaylistDescription] = useState(playlist.attributes.description?.standard);
     const [playlistPublicity, setPlaylistPublicity] = useState(playlist.attributes.isPublic);
+    const [generatedPlaylist, setGeneratedPlaylist] = useState(null);
+
+    const CustomWizardFooter = () => {
+        const {activeStep, goToNextStep, goToPrevStep, close} = useWizardContext();
+        return (
+            <WizardFooter
+                nextButtonText="Create a playlist and add tracks"
+                activeStep={activeStep}
+                onNext={() => {
+                    goToNextStep();
+                    mutation.mutate();
+                }}
+                onBack={goToPrevStep}
+                onClose={close}
+                isBackDisabled={activeStep.index === 1}/>
+        );
+    };
 
     const handleCheckboxChecked = () => {
         setPlaylistPublicity(prevState => !prevState);
     };
+
+    const mutation = useMutation({
+        mutationFn: async () => {
+            try {
+                var generatedPlaylist = await createPlaylist(
+                    spotifyUserId,
+                    playlistName,
+                    playlistDescription,
+                    playlistPublicity,
+                    searchResults
+                );
+
+                setGeneratedPlaylist(generatedPlaylist);
+            } catch (error) {
+                // handle error
+            }
+        }
+    });
 
     return (
         <>
@@ -32,6 +72,7 @@ const SearchModal = ({playlist, tracks, isModalOpen, handleModalToggle, handleWi
                 width="1300px"
                 hasNoBodyWrapper>
                 <Wizard
+                    isProgressive
                     height={400}
                     header={
                         <WizardHeader
@@ -44,7 +85,7 @@ const SearchModal = ({playlist, tracks, isModalOpen, handleModalToggle, handleWi
                     onClose={handleWizardToggle}>
                     <WizardStep
                         id="with-wizard-step-1"
-                        name="Find Apple Music Tracks in Spotify">
+                        name="🔍 Find Apple Music Tracks in Spotify">
                         <div className="row">
                             <div className="col-lg-6">
                                 <div className="fs-4 fw-lighter mb-3 p-2 bg-secondary-subtle">
@@ -80,11 +121,10 @@ const SearchModal = ({playlist, tracks, isModalOpen, handleModalToggle, handleWi
                     </WizardStep>
                     <WizardStep
                         id="with-wizard-step-2"
-                        name="Package to Spotify"
-                        footer={{
-                            nextButtonText: 'Finish',
-                            onNext: handleWizardToggle
-                        }}>
+                        name="📦 Package to Spotify"
+                        footer={
+                            <CustomWizardFooter />
+                        }>
                         <div className="m-3 p-3 border rounded shadow-sm">
                             <div className="d-flex my-3">
                                 <span className="my-1 pe-5 fw-light">
@@ -98,7 +138,7 @@ const SearchModal = ({playlist, tracks, isModalOpen, handleModalToggle, handleWi
                                     onChange={(_event, value) => setPlaylistName(value)}/>
                             </div>
                             <div className="d-flex my-3">
-                                <span className="my-1 pe-5 fw-light">
+                                <span className="my-1 pe-5 ">
                                     Playlist description
                                 </span>
                                 <TextInput
@@ -108,11 +148,11 @@ const SearchModal = ({playlist, tracks, isModalOpen, handleModalToggle, handleWi
                                     onChange={(_event, value) => setPlaylistDescription(value)}/>
                             </div>
                             <div className="d-flex my-3">
-
                                 <Checkbox
                                     isChecked={playlistPublicity}
                                     onChange={handleCheckboxChecked}
-                                    label="is public"
+                                    label="Set to public"
+                                    description="If checked, the playlist will be public"
                                     id="radio-controlled"/>
                             </div>
                         </div>
@@ -127,13 +167,15 @@ const SearchModal = ({playlist, tracks, isModalOpen, handleModalToggle, handleWi
                                                         {result.tracks.items[0].name}{' '}
                                                     </span>
                                                     <div className="ms-auto">
-                                                        <Tooltip content={<div>{result.tracks.items[0]?.album?.name}</div>}>
+                                                        <Tooltip
+                                                            content={<div>{result.tracks.items[0]?.album?.name}</div>}>
                                                             <Label isCompact textMaxWidth="30ch">
                                                                 {result.tracks.items[0].album.name}
                                                             </Label>
                                                         </Tooltip>{' '}
                                                         <Tooltip
-                                                            content={<div>{result.tracks.items[0]?.artists[0]?.name}</div>}>
+                                                            content={
+                                                                <div>{result.tracks.items[0]?.artists[0]?.name}</div>}>
                                                             <Label isCompact textMaxWidth="30ch" color="blue">
                                                                 {result.tracks.items[0]?.artists[0]?.name}
                                                             </Label>
@@ -152,6 +194,19 @@ const SearchModal = ({playlist, tracks, isModalOpen, handleModalToggle, handleWi
                                 </List>
                             </div>
                         </div>
+                    </WizardStep>
+                    <WizardStep
+                        id="with-wizard-step-3"
+                        name="🤓 Review"
+                        footer={{
+                            nextButtonText: 'Finish',
+                            onNext: handleWizardToggle
+                        }}>
+                        {generatedPlaylist && (
+                            <>
+                                <PlaylistDetail playlist={generatedPlaylist} height={470} />
+                            </>
+                        )}
                     </WizardStep>
                 </Wizard>
             </Modal>

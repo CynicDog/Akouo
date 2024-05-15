@@ -12,6 +12,7 @@ import {
     Tooltip
 } from "@patternfly/react-core";
 import React from "react";
+import PlaylistDetail from "./PlaylistDetail.jsx";
 
 const Playlists = () => {
 
@@ -103,28 +104,6 @@ const PlaylistCard = ({playlist}) => {
                 </Drawer>
             </div>
         </ListItem>
-    );
-}
-
-const PlaylistDetail = ({playlist}) => {
-
-    function parseSpotifyURI(spotifyURI) {
-        const parts = spotifyURI.split(':');
-        const type = parts[1];
-        const id = parts[2];
-        return `https://open.spotify.com/embed/${type}/${id}?utm_source=oembed`;
-    }
-    return (
-        <div className="m-3">
-            <iframe
-                width="100%"
-                height="400"
-                title="Spotify Embed: My Path to Spotify: Women in Engineering"
-                frameBorder="0"
-                allowFullScreen
-                allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
-                src={parseSpotifyURI(playlist.uri)}/>
-        </div>
     );
 }
 
