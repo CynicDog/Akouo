@@ -23,7 +23,7 @@ const Playlists = () => {
 
     const {data: spotifyPlaylists = [], isLoading: isSpotifyPlaylistLoading} = useQuery(
         'spotifyPlaylists',
-        () => getCurrentUserPlaylists(sessionStorage.getItem("ACCESS_TOKEN")),
+        () => getCurrentUserPlaylists(),
         {enabled: !!sessionStorage.getItem("ACCESS_TOKEN")}
     );
 

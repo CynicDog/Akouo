@@ -24,10 +24,7 @@ const SearchedTracks = ({ tracks, setSearchResults }) => {
 
     const searchTracksData = async (tracks) => {
         const searchResults = await Promise.all(tracks.map(async (track) => {
-            return await searchForItem(
-                sessionStorage.getItem("ACCESS_TOKEN"),
-                track.relationships?.catalog?.data[0]?.attributes?.isrc,
-            );
+            return await searchForItem(track.relationships?.catalog?.data[0]?.attributes?.isrc);
         }));
         setSearchResults(searchResults.filter(result => result.tracks.items.length > 0));
         return searchResults;

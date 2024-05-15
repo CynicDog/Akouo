@@ -20,9 +20,7 @@ function RecentlyPlayed() {
 
     const {data: recentlyPlayedTracks = [], isLoading: isRecentlyPlayedLoading} = useQuery(
         'recentlyPlayedTracks',
-        () => fetchRecentlyPlayedTracks(
-            sessionStorage.getItem("DT"),
-            sessionStorage.getItem("MUT")),
+        () => fetchRecentlyPlayedTracks(),
         {enabled: !!sessionStorage.getItem("MUT")}
     );
 

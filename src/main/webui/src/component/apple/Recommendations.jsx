@@ -25,9 +25,7 @@ function Recommendations() {
 
     const {data: recommendations = [], isLoading: isRecommendationLoading} = useQuery(
         'recommendations',
-        () => fetchRecommendations(
-            sessionStorage.getItem("DT"),
-            sessionStorage.getItem("MUT")),
+        () => fetchRecommendations(),
         {enabled: !!sessionStorage.getItem("MUT")}
     );
 
@@ -125,17 +123,9 @@ const TrackListPopoverContent = ({relation}) => {
         ['tracks', relation.id, relation.type],
         async () => {
             if (relation.type === 'albums') {
-                return fetchCatalogAlbumRelationByName(
-                    sessionStorage.getItem("DT"),
-                    sessionStorage.getItem("MUT"),
-                    relation.id,
-                    'tracks');
+                return fetchCatalogAlbumRelationByName(relation.id, 'tracks');
             } else if (relation.type === 'playlists') {
-                return fetchCatalogPlaylistRelationByName(
-                    sessionStorage.getItem("DT"),
-                    sessionStorage.getItem("MUT"),
-                    relation.id,
-                    'tracks');
+                return fetchCatalogPlaylistRelationByName(relation.id, 'tracks');
             }
         }
     );

@@ -24,9 +24,7 @@ function Playlists() {
 
     const {data: applePlaylists = [], isLoading: isApplePlaylistLoading} = useQuery(
         'applePlaylists',
-        () => fetchLibraryPlaylists(
-            sessionStorage.getItem("DT"),
-            sessionStorage.getItem("MUT")),
+        () => fetchLibraryPlaylists(),
         {enabled: !!sessionStorage.getItem("MUT")}
     );
 
@@ -134,11 +132,7 @@ const PlaylistDetail = ({playlist}) => {
 
     const {data: tracks, isLoading: isTrackLoading} = useQuery(
         ['playlistTracks', playlist.id],
-        () => fetchLibraryPlaylistRelationByName(
-            sessionStorage.getItem("DT"),
-            sessionStorage.getItem("MUT"),
-            playlist.id,
-            'tracks'),
+        () => fetchLibraryPlaylistRelationByName(playlist.id, 'tracks'),
         {
             enabled: !!playlist.id,
             staleTime: 7_200_000 // 2 hours

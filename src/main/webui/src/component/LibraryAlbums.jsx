@@ -30,12 +30,10 @@ const LibraryAlbums = ({albums, isAlbumLoading}) => {
 };
 
 const AlbumCard = ({album}) => {
-    const developerToken = sessionStorage.getItem('DT');
-    const musicUserToken = sessionStorage.getItem('MUT');
 
     const {data: songs, isLoading: isSongLoading} = useQuery(
         ['albumSongs', album.id],
-        () => fetchLibraryAlbumRelationByName(developerToken, musicUserToken, album.id, "tracks"),
+        () => fetchLibraryAlbumRelationByName(album.id, "tracks"),
         {
             enabled: !!album.id,
             staleTime: 7_200_000 // 2 hours
