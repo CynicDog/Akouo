@@ -58,7 +58,12 @@ public class OAuthAPI {
         String authorization_uri = oauth2Provider.authorizeURL(
                 new OAuth2AuthorizationURL()
                         .setRedirectUri(redirectUri)
-                        .setScopes(Arrays.asList("user-read-private", "user-read-email", "playlist-read-private"))
+                        .setScopes(Arrays.asList(
+                                "user-read-private",
+                                "user-read-email",
+                                "playlist-read-private",
+                                "playlist-modify-public",
+                                "playlist-modify-private"))
                         .setState(state));
 
         ctx.response()
@@ -157,6 +162,7 @@ public class OAuthAPI {
                     .putHeader("Location", "/")
                     .addCookie(Cookie.cookie("access_token", accessToken))
                     .addCookie(Cookie.cookie("spotify_username", spotifyUsername.replaceAll("\\s", "_")))
+                    .addCookie(Cookie.cookie("spotify_user_id", spotifyStationId))
                     .addCookie(Cookie.cookie("spotify_profile_picture", spotifyProfilePicture))
                     .end();
 
