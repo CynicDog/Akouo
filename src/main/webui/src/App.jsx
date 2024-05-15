@@ -20,8 +20,8 @@ import AuthArea from "./component/AuthArea.jsx";
 import {CubesIcon} from "@patternfly/react-icons";
 import AppleIcon from "../public/apple.jsx";
 import SpotifyIcon from "../public/spotify.jsx";
-import AppleComponentsArea from "./component/apple/AppleComponentsArea.jsx";
-import SpotifyComponentsArea from "./component/spotify/SpotifyComponentsArea.jsx";
+import AppleComponentsArea from "./component/AppleComponentsArea.jsx";
+import SpotifyComponentsArea from "./component/SpotifyComponentsArea.jsx";
 import AppleMusicPlayer from "./component/apple/AppleMusicPlayer.jsx";
 
 function App() {

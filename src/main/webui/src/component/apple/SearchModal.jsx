@@ -152,7 +152,7 @@ const SearchModal = ({playlist, tracks, isModalOpen, handleModalToggle, handleWi
                                     isChecked={playlistPublicity}
                                     onChange={handleCheckboxChecked}
                                     label="Set to public"
-                                    description="If checked, the playlist will be public"
+                                    description="If checked, the playlist will be shown to public"
                                     id="radio-controlled"/>
                             </div>
                         </div>

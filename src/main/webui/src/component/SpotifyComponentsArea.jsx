@@ -1,4 +1,4 @@
-import Playlists from "./Playlists.jsx";
+import Playlists from "./spotify/Playlists.jsx";
 
 const SpotifyComponentsArea = () => {
     return (
