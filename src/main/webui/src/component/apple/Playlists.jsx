@@ -134,7 +134,7 @@ const PlaylistDetail = ({playlist}) => {
     };
 
     const {data: tracks, isLoading: isTrackLoading} = useQuery(
-        ['playlistTracks', playlist.id],
+        ['applePlaylistTracks', playlist.id],
         () => fetchLibraryPlaylistRelationByName(playlist.id, 'tracks'),
         {
             enabled: !!playlist.id,
@@ -193,6 +193,7 @@ const PlaylistDetail = ({playlist}) => {
                                 </Label>
                             </div>
                             <SearchModal
+                                targetService={"spotify"}
                                 playlist={playlist}
                                 tracks={tracks.data}
                                 isModalOpen={isModalOpen}

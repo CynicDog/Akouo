@@ -15,13 +15,13 @@ import {createPlaylist} from "../../data/spotifyAPI.js";
 import {useAuth} from "../../Context.jsx";
 import PlaylistDetail from "../spotify/PlaylistDetail.jsx";
 
-const SearchModal = ({playlist, tracks, isModalOpen, handleModalToggle, handleWizardToggle}) => {
+const SearchModal = ({targetService, playlist, tracks, isModalOpen, handleModalToggle, handleWizardToggle}) => {
 
     const {spotifyUserId} = useAuth();
     const [searchResults, setSearchResults] = useState([]);
-    const [playlistName, setPlaylistName] = useState(playlist.attributes.name);
-    const [playlistDescription, setPlaylistDescription] = useState(playlist.attributes.description?.standard);
-    const [playlistPublicity, setPlaylistPublicity] = useState(playlist.attributes.isPublic);
+    const [playlistName, setPlaylistName] = useState(targetService === "spotify" ? playlist.attributes.name : playlist.name);
+    const [playlistDescription, setPlaylistDescription] = useState(targetService === "spotify" ? playlist.attributes.description?.standard : playlist.description);
+    const [playlistPublicity, setPlaylistPublicity] = useState(targetService === "spotify" ? playlist.attributes.isPublic : playlist.public);
     const [generatedPlaylist, setGeneratedPlaylist] = useState(null);
 
     const CustomWizardFooter = () => {
@@ -76,35 +76,35 @@ const SearchModal = ({playlist, tracks, isModalOpen, handleModalToggle, handleWi
                     height={400}
                     header={
                         <WizardHeader
-                            title="Find in Spotify"
+                            title={"Find in " + (targetService === "spotify" ? "Spotify" : "Apple Music")}
                             titleId="modal-wizard-label"
-                            description="Find tracks of your Apple Music playlist in Spotify!"
+                            description={"Find tracks of your " + (targetService === "spotify" ? "Apple Music" : "Spotify") + " playlist in " + (targetService === "spotify" ? "Spotify" : "Apple Music")}
                             onClose={handleWizardToggle}
                             closeButtonAriaLabel="Close wizard"/>
                     }
                     onClose={handleWizardToggle}>
                     <WizardStep
                         id="with-wizard-step-1"
-                        name="🔍 Find Apple Music Tracks in Spotify">
+                        name={"🔍 Search "+ (targetService === "spotify" ? "Apple Music" : "Spotify") +" Tracks"}>
                         <div className="row">
                             <div className="col-lg-6">
                                 <div className="fs-4 fw-lighter mb-3 p-2 bg-secondary-subtle">
-                                    Apple Music Tracks
+                                    {(targetService === "spotify" ? "Apple Music" : "Spotify") + " Tracks"}
                                 </div>
                                 <List component={ListComponent.ol} type={OrderType.number}>
                                     {tracks.map((track, index) => (
                                         <ListItem key={index}>
                                             <span className="fw-light">
-                                                {track.attributes.name}{' '}
+                                                {targetService === "spotify" ? track.attributes.name : track.track.name}{' '}
                                             </span>
-                                            <Tooltip content={<div>{track.attributes.albumName}</div>}>
+                                            <Tooltip content={<div>{targetService === "spotify" ? track.attributes.albumName : track.track.album.name}</div>}>
                                                 <Label isCompact textMaxWidth="7ch">
-                                                    {track.attributes.albumName}
+                                                    {targetService === "spotify" ? track.attributes.albumName : track.track.album.name}
                                                 </Label>
                                             </Tooltip>{' '}
-                                            <Tooltip content={<div>{track.attributes.artistName}</div>}>
+                                            <Tooltip content={<div>{targetService === "spotify" ? track.attributes.artistName : track.track.artists[0].name}</div>}>
                                                 <Label isCompact textMaxWidth="7ch">
-                                                    {track.attributes.artistName}
+                                                    {targetService === "spotify" ? track.attributes.artistName : track.track.artists[0].name}
                                                 </Label>
                                             </Tooltip>
                                         </ListItem>
@@ -113,15 +113,15 @@ const SearchModal = ({playlist, tracks, isModalOpen, handleModalToggle, handleWi
                             </div>
                             <div className="col-lg-6">
                                 <div className="fs-4 fw-lighter mb-3 p-2 bg-secondary-subtle">Tracks searched in
-                                    Spotify
+                                    {targetService === "spotify" ? " Spotify" : " Apple Music"}
                                 </div>
-                                <SearchedTracks tracks={tracks} setSearchResults={setSearchResults}/>
+                                <SearchedTracks targetService={targetService} tracks={tracks} setSearchResults={setSearchResults}/>
                             </div>
                         </div>
                     </WizardStep>
                     <WizardStep
                         id="with-wizard-step-2"
-                        name="📦 Package to Spotify"
+                        name={"📦 Package to " + (targetService === "spotify" ? "Spotify" : "Apple Music")}
                         footer={
                             <CustomWizardFooter />
                         }>
@@ -161,33 +161,54 @@ const SearchModal = ({playlist, tracks, isModalOpen, handleModalToggle, handleWi
                                 <List component={ListComponent.ol} type={OrderType.number}>
                                     {searchResults.map((result, index) => (
                                         <ListItem key={index}>
-                                            {result.tracks.items.length > 0 ? (
-                                                <div className="d-flex">
-                                                    <span className="fw-light">
-                                                        {result.tracks.items[0].name}{' '}
-                                                    </span>
-                                                    <div className="ms-auto">
-                                                        <Tooltip
-                                                            content={<div>{result.tracks.items[0]?.album?.name}</div>}>
-                                                            <Label isCompact textMaxWidth="30ch">
+                                            {targetService === "spotify" ? (
+                                                result.tracks.items.length > 0 ? (
+                                                    <>
+                                                        <span className="fw-light">
+                                                            {result.tracks.items[0].name}{' '}
+                                                        </span>
+                                                        <Tooltip content={<div>{result.tracks.items[0]?.album?.name}</div>}>
+                                                            <Label isCompact textMaxWidth="7ch">
                                                                 {result.tracks.items[0].album.name}
                                                             </Label>
                                                         </Tooltip>{' '}
-                                                        <Tooltip
-                                                            content={
-                                                                <div>{result.tracks.items[0]?.artists[0]?.name}</div>}>
-                                                            <Label isCompact textMaxWidth="30ch" color="blue">
+                                                        <Tooltip content={<div>{result.tracks.items[0]?.artists[0]?.name}</div>}>
+                                                            <Label isCompact textMaxWidth="7ch">
                                                                 {result.tracks.items[0]?.artists[0]?.name}
                                                             </Label>
                                                         </Tooltip>
-                                                    </div>
-                                                </div>
+                                                    </>
+                                                ) : (
+                                                    <HelperText>
+                                                        <HelperTextItem variant="error" hasIcon>
+                                                            not found
+                                                        </HelperTextItem>
+                                                    </HelperText>
+                                                )
                                             ) : (
-                                                <HelperText>
-                                                    <HelperTextItem variant="error" hasIcon>
-                                                        not found
-                                                    </HelperTextItem>
-                                                </HelperText>
+                                                result.data.length > 0 ? (
+                                                    <>
+                                                        <span className="fw-light">
+                                                            {result.data[0].attributes.name}{' '}
+                                                        </span>
+                                                        <Tooltip content={<div>{result.data[0].attributes.albumName}</div>}>
+                                                            <Label isCompact textMaxWidth="7ch">
+                                                                {result.data[0].attributes.albumName}
+                                                            </Label>
+                                                        </Tooltip>{' '}
+                                                        <Tooltip content={<div>{result.data[0].attributes.artistName}</div>}>
+                                                            <Label isCompact textMaxWidth="7ch">
+                                                                {result.data[0].attributes.artistName}
+                                                            </Label>
+                                                        </Tooltip>
+                                                    </>
+                                                ) : (
+                                                    <HelperText>
+                                                        <HelperTextItem variant="error" hasIcon>
+                                                            not found
+                                                        </HelperTextItem>
+                                                    </HelperText>
+                                                )
                                             )}
                                         </ListItem>
                                     ))}

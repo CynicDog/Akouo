@@ -66,6 +66,10 @@ export const fetchRecommendations = async () => {
     return fetchData('https://api.music.apple.com/v1/me/recommendations?l=en');
 };
 
+export const fetchMultipleCatalogSongsByISRC = async (isrc) => {
+    return fetchData(`https://api.music.apple.com/v1/catalog/kr/songs?filter[isrc]=${isrc}`);
+}
+
 const fetchData = async (url) => {
 
     var developerToken = sessionStorage.getItem("DT")

@@ -12,6 +12,10 @@ export const searchForItem = async (isrc) => {
     return fetchData(`https://api.spotify.com/v1/search?type=track&q=isrc%3A${isrc}&limit=1`);
 }
 
+export const getPlaylistItem = async (playlistId, type) => {
+    return fetchData(`https://api.spotify.com/v1/playlists/${playlistId}/${type}`)
+}
+
 // Create a playlist for a Spotify user
 export const createPlaylist = async (userId, name, description, isPublic, tracks) => {
 
