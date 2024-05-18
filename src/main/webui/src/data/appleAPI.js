@@ -66,8 +66,72 @@ export const fetchRecommendations = async () => {
     return fetchData('https://api.music.apple.com/v1/me/recommendations?l=en');
 };
 
+// Fetch one or more songs by using their International Standard Recording Code (ISRC) values.
 export const fetchMultipleCatalogSongsByISRC = async (isrc) => {
     return fetchData(`https://api.music.apple.com/v1/catalog/kr/songs?filter[isrc]=${isrc}`);
+}
+
+// Create a new playlist in a user’s library.
+export const createLibraryPlaylist = async (name, description, isPublic, tracks) => {
+
+    const body = {
+        attributes: {
+            name: name,
+            isPublic: isPublic,
+            description: description
+        }
+    }
+
+    const url = 'https://api.music.apple.com/v1/me/library/playlists'
+
+    const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+            'Authorization': `Bearer ${sessionStorage.getItem("DT")}`,
+            'Music-User-Token': sessionStorage.getItem("MUT")
+        },
+        body: JSON.stringify(body)
+    });
+
+    if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const playlist = await response.json();
+
+    await addTracksToLibraryPlaylist(playlist.data[0].id, tracks);
+
+    return playlist.data[0];
+}
+
+// A request to add tracks to a library playlist.
+export const addTracksToLibraryPlaylist = async (playlistId, tracks) => {
+
+    const tracksData = tracks.map(track => ({
+        id: track.data[0].id,
+        type: "songs"
+    }));
+
+    const url = `https://api.music.apple.com/v1/me/library/playlists/${playlistId}/tracks`
+
+    const body = {
+        data: tracksData
+    }
+
+    const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+            'Authorization': `Bearer ${sessionStorage.getItem("DT")}`,
+            'Music-User-Token': sessionStorage.getItem("MUT")
+        },
+        body: JSON.stringify(body)
+    });
+
+    if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    return response.json();
 }
 
 const fetchData = async (url) => {

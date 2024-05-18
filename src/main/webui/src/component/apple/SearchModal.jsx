@@ -14,6 +14,7 @@ import {useMutation} from "react-query";
 import {createPlaylist} from "../../data/spotifyAPI.js";
 import {useAuth} from "../../Context.jsx";
 import PlaylistDetail from "../spotify/PlaylistDetail.jsx";
+import {createLibraryPlaylist} from "../../data/appleAPI.js";
 
 const SearchModal = ({targetService, playlist, tracks, isModalOpen, handleModalToggle, handleWizardToggle}) => {
 
@@ -47,13 +48,20 @@ const SearchModal = ({targetService, playlist, tracks, isModalOpen, handleModalT
     const mutation = useMutation({
         mutationFn: async () => {
             try {
-                var generatedPlaylist = await createPlaylist(
-                    spotifyUserId,
-                    playlistName,
-                    playlistDescription,
-                    playlistPublicity,
-                    searchResults
-                );
+                var generatedPlaylist = targetService === "spotify" ?
+                    await createPlaylist(spotifyUserId,
+                        playlistName,
+                        playlistDescription,
+                        playlistPublicity,
+                        searchResults
+                    ) :
+                    await createLibraryPlaylist(
+                        playlistName,
+                        playlistDescription,
+                        playlistPublicity,
+                        searchResults
+                    )
+                ;
 
                 setGeneratedPlaylist(generatedPlaylist);
             } catch (error) {
@@ -85,7 +93,7 @@ const SearchModal = ({targetService, playlist, tracks, isModalOpen, handleModalT
                     onClose={handleWizardToggle}>
                     <WizardStep
                         id="with-wizard-step-1"
-                        name={"🔍 Search "+ (targetService === "spotify" ? "Apple Music" : "Spotify") +" Tracks"}>
+                        name={"🔍 Search " + (targetService === "spotify" ? "Apple Music" : "Spotify") + " Tracks"}>
                         <div className="row">
                             <div className="col-lg-6">
                                 <div className="fs-4 fw-lighter mb-3 p-2 bg-secondary-subtle">
@@ -97,12 +105,14 @@ const SearchModal = ({targetService, playlist, tracks, isModalOpen, handleModalT
                                             <span className="fw-light">
                                                 {targetService === "spotify" ? track.attributes.name : track.track.name}{' '}
                                             </span>
-                                            <Tooltip content={<div>{targetService === "spotify" ? track.attributes.albumName : track.track.album.name}</div>}>
+                                            <Tooltip content={
+                                                <div>{targetService === "spotify" ? track.attributes.albumName : track.track.album.name}</div>}>
                                                 <Label isCompact textMaxWidth="7ch">
                                                     {targetService === "spotify" ? track.attributes.albumName : track.track.album.name}
                                                 </Label>
                                             </Tooltip>{' '}
-                                            <Tooltip content={<div>{targetService === "spotify" ? track.attributes.artistName : track.track.artists[0].name}</div>}>
+                                            <Tooltip content={
+                                                <div>{targetService === "spotify" ? track.attributes.artistName : track.track.artists[0].name}</div>}>
                                                 <Label isCompact textMaxWidth="7ch">
                                                     {targetService === "spotify" ? track.attributes.artistName : track.track.artists[0].name}
                                                 </Label>
@@ -115,7 +125,8 @@ const SearchModal = ({targetService, playlist, tracks, isModalOpen, handleModalT
                                 <div className="fs-4 fw-lighter mb-3 p-2 bg-secondary-subtle">Tracks searched in
                                     {targetService === "spotify" ? " Spotify" : " Apple Music"}
                                 </div>
-                                <SearchedTracks targetService={targetService} tracks={tracks} setSearchResults={setSearchResults}/>
+                                <SearchedTracks targetService={targetService} tracks={tracks}
+                                                setSearchResults={setSearchResults}/>
                             </div>
                         </div>
                     </WizardStep>
@@ -123,7 +134,7 @@ const SearchModal = ({targetService, playlist, tracks, isModalOpen, handleModalT
                         id="with-wizard-step-2"
                         name={"📦 Package to " + (targetService === "spotify" ? "Spotify" : "Apple Music")}
                         footer={
-                            <CustomWizardFooter />
+                            <CustomWizardFooter/>
                         }>
                         <div className="m-3 p-3 border rounded shadow-sm">
                             <div className="d-flex my-3">
@@ -167,12 +178,14 @@ const SearchModal = ({targetService, playlist, tracks, isModalOpen, handleModalT
                                                         <span className="fw-light">
                                                             {result.tracks.items[0].name}{' '}
                                                         </span>
-                                                        <Tooltip content={<div>{result.tracks.items[0]?.album?.name}</div>}>
+                                                        <Tooltip
+                                                            content={<div>{result.tracks.items[0]?.album?.name}</div>}>
                                                             <Label isCompact textMaxWidth="7ch">
                                                                 {result.tracks.items[0].album.name}
                                                             </Label>
                                                         </Tooltip>{' '}
-                                                        <Tooltip content={<div>{result.tracks.items[0]?.artists[0]?.name}</div>}>
+                                                        <Tooltip content={
+                                                            <div>{result.tracks.items[0]?.artists[0]?.name}</div>}>
                                                             <Label isCompact textMaxWidth="7ch">
                                                                 {result.tracks.items[0]?.artists[0]?.name}
                                                             </Label>
@@ -191,12 +204,14 @@ const SearchModal = ({targetService, playlist, tracks, isModalOpen, handleModalT
                                                         <span className="fw-light">
                                                             {result.data[0].attributes.name}{' '}
                                                         </span>
-                                                        <Tooltip content={<div>{result.data[0].attributes.albumName}</div>}>
+                                                        <Tooltip
+                                                            content={<div>{result.data[0].attributes.albumName}</div>}>
                                                             <Label isCompact textMaxWidth="7ch">
                                                                 {result.data[0].attributes.albumName}
                                                             </Label>
                                                         </Tooltip>{' '}
-                                                        <Tooltip content={<div>{result.data[0].attributes.artistName}</div>}>
+                                                        <Tooltip
+                                                            content={<div>{result.data[0].attributes.artistName}</div>}>
                                                             <Label isCompact textMaxWidth="7ch">
                                                                 {result.data[0].attributes.artistName}
                                                             </Label>
@@ -224,9 +239,25 @@ const SearchModal = ({targetService, playlist, tracks, isModalOpen, handleModalT
                             onNext: handleWizardToggle
                         }}>
                         {generatedPlaylist && (
-                            <>
-                                <PlaylistDetail playlist={generatedPlaylist} height={470} />
-                            </>
+                            targetService === "spotify" ? (
+                                <PlaylistDetail targetService={targetService} playlist={generatedPlaylist}
+                                                height={470}/>
+                            ) : (
+                                /*TODO: Lockup rendering is not properly being done with add tracks request */
+                                <div className="d-flex flex-column justify-content-center align-items-center"
+                                     style={{marginTop: "100px"}}>
+                                    <apple-music-artwork-lockup
+                                        type="playlist"
+                                        content-id={generatedPlaylist.attributes.playParams.globalId}
+                                        width="250"
+                                    />
+                                    <div className="mt-3">
+                                        <div className="fw-lighter">
+                                            {generatedPlaylist.attributes.name}
+                                        </div>
+                                    </div>
+                                </div>
+                            )
                         )}
                     </WizardStep>
                 </Wizard>
