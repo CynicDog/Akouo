@@ -40,6 +40,7 @@ const PlaylistDetail = ({playlist, height = 400}) => {
             <iframe
                 width="100%"
                 height={height}
+                style={{borderRadius: "20px"}}
                 title="Spotify Embed: My Path to Spotify: Women in Engineering"
                 frameBorder="0"
                 allowFullScreen
