@@ -1,42 +1,55 @@
 package io.cynicdog.API;
 
+import io.cynicdog.util.CircuitBreakerService;
+import io.github.resilience4j.circuitbreaker.CircuitBreaker;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.RoutingContext;
 import io.vertx.ext.web.client.WebClient;
+import io.vertx.ext.web.codec.BodyCodec;
 import org.jboss.logging.Logger;
+
+import jakarta.inject.Inject;
 
 public class AppleMusicAPI {
 
     static final Logger logger = Logger.getLogger(AppleMusicAPI.class);
 
     final Vertx vertx;
+    final CircuitBreakerService circuitBreakerService;
     final String developerToken;
 
-    public AppleMusicAPI(Vertx vertx, String developerToken) {
+    @Inject
+    public AppleMusicAPI(Vertx vertx, CircuitBreakerService circuitBreakerService, String developerToken) {
         this.vertx = vertx;
+        this.circuitBreakerService = circuitBreakerService;
         this.developerToken = developerToken;
     }
 
     private void fetchData(RoutingContext ctx, String remoteUrl, String musicUserToken) {
-
         WebClient client = WebClient.create(vertx);
+        CircuitBreaker circuitBreaker = circuitBreakerService.getCircuitBreaker("apple-music");
 
-        client.getAbs(remoteUrl)
-                .putHeader("Authorization", "Bearer " + developerToken)
-                .putHeader("Music-User-Token", musicUserToken)
-                .send(ar -> {
-                    if (ar.succeeded()) {
-                        ctx.response()
-                                .putHeader("Content-Type", "application/json")
-                                .end(ar.result().bodyAsJsonObject().encode());
-                    } else {
-                        ctx.response()
-                                .setStatusCode(500)
-                                .end(new JsonObject().put("error", ar.cause().getMessage()).encode());
-                    }
-                });
+        circuitBreaker.executeSupplier(() -> {
+            return client.getAbs(remoteUrl)
+                    .putHeader("Authorization", "Bearer " + developerToken)
+                    .putHeader("Music-User-Token", musicUserToken)
+                    .as(BodyCodec.jsonObject())
+                    .send()
+                    .map(response -> response.body())
+                    .toCompletionStage();
+        }).whenComplete((response, throwable) -> {
+            if (throwable != null) {
+                ctx.response()
+                        .setStatusCode(500)
+                        .end(new JsonObject().put("error", throwable.getMessage()).encode());
+            } else {
+                ctx.response()
+                        .putHeader("Content-Type", "application/json")
+                        .end(response.encode());
+            }
+        });
     }
 
     private String validateAccessToken(RoutingContext ctx) {
@@ -49,12 +62,10 @@ public class AppleMusicAPI {
             return null;
         }
 
-        // Remove "Bearer " prefix to get the actual token
         return musicUserToken;
     }
 
     public void fetchLibraryPlaylists(RoutingContext ctx) {
-
         var musicUserToken = validateAccessToken(ctx);
         if (musicUserToken == null) return;
 
@@ -62,7 +73,6 @@ public class AppleMusicAPI {
     }
 
     public void fetchLibraryPlaylistRelationByName(RoutingContext ctx) {
-
         var musicUserToken = validateAccessToken(ctx);
         if (musicUserToken == null) return;
 
@@ -80,7 +90,6 @@ public class AppleMusicAPI {
     }
 
     public void fetchMultipleCatalogSongsByISRC(RoutingContext ctx) {
-
         var musicUserToken = validateAccessToken(ctx);
         if (musicUserToken == null) return;
 
@@ -97,7 +106,6 @@ public class AppleMusicAPI {
     }
 
     public void createLibraryPlaylist(RoutingContext ctx) {
-
         var musicUserToken = validateAccessToken(ctx);
         if (musicUserToken == null) return;
 
@@ -124,47 +132,53 @@ public class AppleMusicAPI {
                         .put("public", isPublic)
                 );
 
-        client.postAbs("https://api.music.apple.com/v1/me/library/playlists")
-                .putHeader("Authorization", "Bearer " + developerToken)
-                .putHeader("Music-User-Token", musicUserToken)
-                .putHeader("Content-Type", "application/json")
-                .sendJsonObject(body, ar -> {
-                    if (ar.succeeded()) {
-                        JsonObject playlist = ar.result().bodyAsJsonObject();
-                        String playlistId = playlist.getJsonArray("data").getJsonObject(0).getString("id");
+        CircuitBreaker circuitBreaker = circuitBreakerService.getCircuitBreaker("apple-music");
 
-                        logger.info("playlistId:" + playlistId);
-                        logger.info("data:" + data);
-
-                        addTracksToLibraryPlaylist(ctx, client, musicUserToken, playlistId, data, playlist);
-                    } else {
-                        ctx.response()
-                                .setStatusCode(500)
-                                .end(new JsonObject().put("error", ar.cause().getMessage()).encode());
-                    }
-                });
+        circuitBreaker.executeSupplier(() -> {
+            return client.postAbs("https://api.music.apple.com/v1/me/library/playlists")
+                    .putHeader("Authorization", "Bearer " + developerToken)
+                    .putHeader("Music-User-Token", musicUserToken)
+                    .putHeader("Content-Type", "application/json")
+                    .sendJsonObject(body)
+                    .map(response -> response.bodyAsJsonObject())
+                    .toCompletionStage();
+        }).whenComplete((playlist, throwable) -> {
+            if (throwable != null) {
+                ctx.response()
+                        .setStatusCode(500)
+                        .end(new JsonObject().put("error", throwable.getMessage()).encode());
+            } else {
+                String playlistId = playlist.getJsonArray("data").getJsonObject(0).getString("id");
+                addTracksToLibraryPlaylist(ctx, client, musicUserToken, playlistId, data, playlist);
+            }
+        });
     }
 
     public void addTracksToLibraryPlaylist(RoutingContext ctx, WebClient client, String musicUserToken, String playlistId, JsonArray data, JsonObject playlist) {
-
         String url = "https://api.music.apple.com/v1/me/library/playlists/" + playlistId + "/tracks";
         JsonObject body = new JsonObject()
                 .put("data", data);
 
-        client.postAbs(url)
-                .putHeader("Authorization", "Bearer " + developerToken)
-                .putHeader("Music-User-Token", musicUserToken)
-                .putHeader("Content-Type", "application/json")
-                .sendJsonObject(body, ar -> {
-                    if (ar.succeeded()) {
-                        ctx.response()
-                                .setStatusCode(200)
-                                .end(playlist.encode());
-                    } else {
-                        ctx.response()
-                                .setStatusCode(500)
-                                .end(new JsonObject().put("error", ar.cause().getMessage()).encode());
-                    }
-                });
+        CircuitBreaker circuitBreaker = circuitBreakerService.getCircuitBreaker("apple-music");
+
+        circuitBreaker.executeSupplier(() -> {
+            return client.postAbs(url)
+                    .putHeader("Authorization", "Bearer " + developerToken)
+                    .putHeader("Music-User-Token", musicUserToken)
+                    .putHeader("Content-Type", "application/json")
+                    .sendJsonObject(body)
+                    .map(response -> response.bodyAsJsonObject())
+                    .toCompletionStage();
+        }).whenComplete((result, throwable) -> {
+            if (throwable != null) {
+                ctx.response()
+                        .setStatusCode(500)
+                        .end(new JsonObject().put("error", throwable.getMessage()).encode());
+            } else {
+                ctx.response()
+                        .setStatusCode(200)
+                        .end(playlist.encode());
+            }
+        });
     }
 }

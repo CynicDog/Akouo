@@ -6,7 +6,7 @@ import AppleIcon from "../../../public/apple.jsx";
 import {useQuery} from "react-query";
 import {getPlaylistItem} from "../../data/spotifyAPI.js";
 
-const PlaylistDetail = ({playlist, height = 400}) => {
+const PlaylistDetail = ({playlist, height = 400, fromModal = false}) => {
 
     const {isAppleAuthenticated} = useAuth();
 
@@ -45,7 +45,7 @@ const PlaylistDetail = ({playlist, height = 400}) => {
                 allowFullScreen
                 allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
                 src={parseSpotifyURI(playlist.uri)}/>
-            {isAppleAuthenticated && !isTrackLoading && (
+            {isAppleAuthenticated && !isTrackLoading && !fromModal && (
                 <div>
                     <div className="d-flex">
                         <div className="ms-auto">

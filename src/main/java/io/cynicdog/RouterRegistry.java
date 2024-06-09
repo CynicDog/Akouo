@@ -2,6 +2,9 @@ package io.cynicdog;
 
 import io.cynicdog.API.AppleMusicAPI;
 import io.cynicdog.API.SpotifyAPI;
+import io.cynicdog.util.CircuitBreakerService;
+import io.github.resilience4j.circuitbreaker.CircuitBreaker;
+import io.github.resilience4j.circuitbreaker.CircuitBreakerConfig;
 import io.vertx.core.Vertx;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.handler.BodyHandler;
@@ -17,6 +20,9 @@ public class RouterRegistry {
 
     @Inject
     Vertx vertx;
+
+    @Inject
+    CircuitBreakerService circuitBreaker;
 
     static final Logger logger = Logger.getLogger(RouterRegistry.class);
 
@@ -40,8 +46,8 @@ public class RouterRegistry {
 
         router.route().handler(BodyHandler.create());
 
-        var spotifyAPI = new SpotifyAPI(vertx, host, port, CLIENT_ID, CLIENT_SECRET, redirectUri);
-        var appleMusicAPI = new AppleMusicAPI(vertx, developerToken);
+        var spotifyAPI = new SpotifyAPI(vertx, circuitBreaker, host, port, CLIENT_ID, CLIENT_SECRET, redirectUri);
+        var appleMusicAPI = new AppleMusicAPI(vertx, circuitBreaker, developerToken);
 
         router.get("/login").handler(spotifyAPI::login);
         router.get("/callback").handler(spotifyAPI::callback);

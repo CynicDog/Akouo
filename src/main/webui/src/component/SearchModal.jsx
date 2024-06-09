@@ -241,10 +241,8 @@ const SearchModal = ({targetService, playlist, tracks, isModalOpen, handleModalT
                         }}>
                         {generatedPlaylist && (
                             targetService === "spotify" ? (
-                                <PlaylistDetail targetService={targetService} playlist={generatedPlaylist}
-                                                height={470}/>
+                                <PlaylistDetail targetService={targetService} playlist={generatedPlaylist} height={470} fromModal={true}/>
                             ) : (
-                                /*TODO: Lockup rendering is not properly being done with add tracks request */
                                 <div className="d-flex flex-column justify-content-center align-items-center"
                                      style={{marginTop: "100px"}}>
                                     <apple-music-artwork-lockup
