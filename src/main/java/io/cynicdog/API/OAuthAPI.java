@@ -1,4 +1,4 @@
-package io.cynicdog;
+package io.cynicdog.API;
 
 import io.vertx.core.MultiMap;
 import io.vertx.core.Vertx;

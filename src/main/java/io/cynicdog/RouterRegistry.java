@@ -1,5 +1,6 @@
 package io.cynicdog;
 
+import io.cynicdog.API.OAuthAPI;
 import io.vertx.core.Vertx;
 import io.vertx.ext.bridge.PermittedOptions;
 import io.vertx.ext.web.Router;
@@ -44,14 +45,15 @@ public class RouterRegistry {
                 ctx.response().end("Welcome to Akouo 🎶 <br/ > Your gateway to a seamless journey of music exploration and connection!")
         );
 
-        router.route("/eventbus/*").subRouter(
-                SockJSHandler.create(vertx).bridge(new SockJSBridgeOptions()
-                        .addInboundPermitted(new PermittedOptions().setAddressRegex("EB.*"))
-                        .addOutboundPermitted(new PermittedOptions().setAddressRegex("EB.*")))
-        );
 
-        AtomicInteger counter = new AtomicInteger();
-        vertx.setPeriodic(3000,
-                ignored -> vertx.eventBus().publish("EB.ticks", counter.getAndIncrement()));
+//        router.route("/eventbus/*").subRouter(
+//                SockJSHandler.create(vertx).bridge(new SockJSBridgeOptions()
+//                        .addInboundPermitted(new PermittedOptions().setAddressRegex("EB.*"))
+//                        .addOutboundPermitted(new PermittedOptions().setAddressRegex("EB.*")))
+//        );
+//
+//        AtomicInteger counter = new AtomicInteger();
+//        vertx.setPeriodic(3000,
+//                ignored -> vertx.eventBus().publish("EB.ticks", counter.getAndIncrement()));
     }
 }

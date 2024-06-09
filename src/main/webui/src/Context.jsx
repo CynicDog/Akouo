@@ -1,8 +1,12 @@
 import {createContext, useContext, useEffect, useState} from "react";
 import {
-    getSpotifyAccessTokenFromCookie, getSpotifyProfilePictureFromCookie,
+    getSpotifyAccessTokenFromCookie,
+    getSpotifyProfilePictureFromCookie, getSpotifyUserIdFromCookie,
     getSpotifyUsernameFromCookie,
-    removeSpotifyAccessTokenCookie, removeSpotifyProfilePictureCooke, removeSpotifyUsernameCookie
+    removeSpotifyAccessTokenCookie,
+    removeSpotifyProfilePictureCooke,
+    removeSpotifyUserIdCookie,
+    removeSpotifyUsernameCookie
 } from "./module/cookie.js";
 
 // Theme Provider
@@ -33,6 +37,7 @@ export const AuthProvider = ({ children }) => {
     const [musicInstance, setMusicInstance] = useState(null);
     const [appleUsername, setAppleUsername] = useState(null);
     const [spotifyUsername, setSpotifyUsername] = useState(null);
+    const [spotifyUserId, setSpotifyUserId] = useState(null);
     const [spotifyProfilePicture, setSpotifyProfilePicture] = useState(null);
 
     useEffect(() => {
@@ -48,6 +53,11 @@ export const AuthProvider = ({ children }) => {
         const spotifyUsername = getSpotifyUsernameFromCookie();
         if (spotifyUsername !== null) {
             setSpotifyUsername(spotifyUsername);
+        }
+
+        const spotifyUserId = getSpotifyUserIdFromCookie();
+        if (spotifyUserId !== null) {
+            setSpotifyUserId(spotifyUserId);
         }
 
         const spotifyProfilePicture = getSpotifyProfilePictureFromCookie();
@@ -142,6 +152,7 @@ export const AuthProvider = ({ children }) => {
 
         removeSpotifyAccessTokenCookie();
         removeSpotifyUsernameCookie();
+        removeSpotifyUserIdCookie();
         removeSpotifyProfilePictureCooke();
 
         sessionStorage.removeItem("ACCESS_TOKEN");
@@ -157,6 +168,7 @@ export const AuthProvider = ({ children }) => {
         musicInstance,
         appleUsername,
         spotifyUsername,
+        spotifyUserId,
         spotifyProfilePicture,
         handleAppleSignIn,
         handleAppleSignOut,
