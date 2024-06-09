@@ -63,6 +63,8 @@ public class RouterRegistry {
         appleMusicRouter.get("/fetchLibraryPlaylists").handler(appleMusicAPI::fetchLibraryPlaylists);
         appleMusicRouter.get("/fetchLibraryPlaylistRelationByName/:id/:relation").handler(appleMusicAPI::fetchLibraryPlaylistRelationByName);
         appleMusicRouter.get("/fetchMultipleCatalogSongsByISRC").handler(appleMusicAPI::fetchMultipleCatalogSongsByISRC);
+        appleMusicRouter.post("/createLibraryPlaylist").handler(appleMusicAPI::createLibraryPlaylist);
+
 //        router.route("/eventbus/*").subRouter(
 //                SockJSHandler.create(vertx).bridge(new SockJSBridgeOptions()
 //                        .addInboundPermitted(new PermittedOptions().setAddressRegex("EB.*"))

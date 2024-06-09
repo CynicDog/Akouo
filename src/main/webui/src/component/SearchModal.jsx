@@ -11,10 +11,10 @@ import {
 import React, {useState} from "react";
 import SearchedTracks from "./SearchedTracks.jsx";
 import {useMutation} from "react-query";
-import {createPlaylist} from "../../data/spotifyAPI.js";
-import {useAuth} from "../../Context.jsx";
-import PlaylistDetail from "../spotify/PlaylistDetail.jsx";
-import {createLibraryPlaylist} from "../../data/appleAPI.js";
+import {createPlaylist} from "../data/spotifyAPI.js";
+import {useAuth} from "../Context.jsx";
+import PlaylistDetail from "./spotify/PlaylistDetail.jsx";
+import {createLibraryPlaylist} from "../data/appleAPI.js";
 
 const SearchModal = ({targetService, playlist, tracks, isModalOpen, handleModalToggle, handleWizardToggle}) => {
 
@@ -31,6 +31,7 @@ const SearchModal = ({targetService, playlist, tracks, isModalOpen, handleModalT
             <WizardFooter
                 nextButtonText="Create a playlist and add tracks"
                 activeStep={activeStep}
+                isNextDisabled={searchResults.length === 0}
                 onNext={() => {
                     goToNextStep();
                     mutation.mutate();

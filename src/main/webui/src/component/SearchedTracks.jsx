@@ -1,17 +1,15 @@
 import {useQuery} from "react-query";
-import {searchForItem} from "../../data/spotifyAPI.js";
+import {searchForItem} from "../data/spotifyAPI.js";
+import {fetchMultipleCatalogSongsByISRC} from "../data/appleAPI.js";
 import {
-    Badge, HelperText, HelperTextItem,
+    HelperText, HelperTextItem,
     Label,
     List,
-    ListComponent,
     ListItem,
-    OrderType,
     Spinner,
     Tooltip
 } from "@patternfly/react-core";
 import React from "react";
-import {fetchMultipleCatalogSongsByISRC} from "../../data/appleAPI.js";
 
 const SearchedTracks = ({targetService, tracks, setSearchResults}) => {
     const {data: searchResults, isLoading, isError} = useQuery(

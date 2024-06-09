@@ -24,23 +24,27 @@ export const fetchMultipleCatalogSongsByISRC = async (isrc) => {
 // Create a new playlist in a user’s library.
 export const createLibraryPlaylist = async (name, description, isPublic, tracks) => {
 
-    const body = {
+    const tracksData = tracks.map(track => ({
+        id: track.data[0].id,
+        type: "songs"
+    }));
+
+    const body = JSON.stringify( {
         attributes: {
             name: name,
             isPublic: isPublic,
             description: description
-        }
-    }
+        },
+        data: tracksData
+    })
 
-    const url = 'https://api.music.apple.com/v1/me/library/playlists'
-
-    const response = await fetch(url, {
+    const response = await fetch('/api/apple/createLibraryPlaylist', {
         method: 'POST',
         headers: {
             'Authorization': `Bearer ${sessionStorage.getItem("DT")}`,
             'Music-User-Token': sessionStorage.getItem("MUT")
         },
-        body: JSON.stringify(body)
+        body: body
     });
 
     if (!response.ok) {
@@ -49,40 +53,41 @@ export const createLibraryPlaylist = async (name, description, isPublic, tracks)
 
     const playlist = await response.json();
 
-    await addTracksToLibraryPlaylist(playlist.data[0].id, tracks);
+//    await addTracksToLibraryPlaylist(playlist.data[0].id, tracks);
 
     return playlist.data[0];
 }
 
-// A request to add tracks to a library playlist.
-export const addTracksToLibraryPlaylist = async (playlistId, tracks) => {
-
-    const tracksData = tracks.map(track => ({
-        id: track.data[0].id,
-        type: "songs"
-    }));
-
-    const url = `https://api.music.apple.com/v1/me/library/playlists/${playlistId}/tracks`
-
-    const body = {
-        data: tracksData
-    }
-
-    const response = await fetch(url, {
-        method: 'POST',
-        headers: {
-            'Authorization': `Bearer ${sessionStorage.getItem("DT")}`,
-            'Music-User-Token': sessionStorage.getItem("MUT")
-        },
-        body: JSON.stringify(body)
-    });
-
-    if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-    }
-
-    return response.json();
-}
+// will be performed in server
+// // A request to add tracks to a library playlist.
+// export const addTracksToLibraryPlaylist = async (playlistId, tracks) => {
+//
+//     const tracksData = tracks.map(track => ({
+//         id: track.data[0].id,
+//         type: "songs"
+//     }));
+//
+//     const url = `https://api.music.apple.com/v1/me/library/playlists/${playlistId}/tracks`
+//
+//     const body = {
+//         data: tracksData
+//     }
+//
+//     const response = await fetch(url, {
+//         method: 'POST',
+//         headers: {
+//             'Authorization': `Bearer ${sessionStorage.getItem("DT")}`,
+//             'Music-User-Token': sessionStorage.getItem("MUT")
+//         },
+//         body: JSON.stringify(body)
+//     });
+//
+//     if (!response.ok) {
+//         throw new Error(`HTTP error! status: ${response.status}`);
+//     }
+//
+//     return response.json();
+// }
 
 const fetchData = async (url) => {
 

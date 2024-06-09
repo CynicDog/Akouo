@@ -12,7 +12,7 @@ import {
     DrawerHead,
     DrawerPanelContent, Drawer, DrawerContent, DrawerContentBody
 } from '@patternfly/react-core';
-import SearchModal from "./SearchModal.jsx";
+import SearchModal from "../SearchModal.jsx";
 import SpotifyIcon from "../../../public/spotify.jsx";
 import {useAuth} from "../../Context.jsx";
 
@@ -151,41 +151,35 @@ const PlaylistDetail = ({playlist}) => {
             ) : (
                 <>
                     <div className="row">
-                        <div className="col-lg-4">
-                            <apple-music-artwork-lockup type="playlist"
-                                                        content-id={playlist.attributes.playParams.globalId}
-                                                        width="250"/>
-                        </div>
-                        <div className="col-lg-8">
-                            <List isPlain isBordered style={{height: '250px', overflowY: 'auto'}}>
-                                {tracks.data.map((track, index) => (
-                                    <ListItem className="fw-lighter" key={index}>
-                                        <div className="fw-light">
-                                            {track.attributes.name} {' '}
-                                            <Label isCompact>
-                                                {track.attributes.genreNames.join(",")}
-                                            </Label>{' '}
-                                            <Tooltip content={<div>{track.attributes.artistName}</div>}>
-                                                <Label textMaxWidth="100px" isCompact>
-                                                    {track.attributes.artistName}
-                                                </Label>
-                                            </Tooltip>{' '}
-                                            <Tooltip content={<div>{track.attributes.albumName}</div>}>
-                                                <Label isCompact textMaxWidth="100px" color="blue">
-                                                    {track.attributes.albumName}
-                                                </Label>
-                                            </Tooltip>
-                                        </div>
-                                    </ListItem>
-                                ))}
-                            </List>
-                        </div>
+
+                        <List isPlain isBordered style={{height: '250px', overflowY: 'auto'}}>
+                            {tracks.data.map((track, index) => (
+                                <ListItem className="fw-lighter" key={index}>
+                                    <div className="fw-light">
+                                        {track.attributes.name} {' '}
+                                        <Label isCompact>
+                                            {track.attributes.genreNames.join(",")}
+                                        </Label>{' '}
+                                        <Tooltip content={<div>{track.attributes.artistName}</div>}>
+                                            <Label textMaxWidth="100px" isCompact>
+                                                {track.attributes.artistName}
+                                            </Label>
+                                        </Tooltip>{' '}
+                                        <Tooltip content={<div>{track.attributes.albumName}</div>}>
+                                            <Label isCompact textMaxWidth="100px" color="blue">
+                                                {track.attributes.albumName}
+                                            </Label>
+                                        </Tooltip>
+                                    </div>
+                                </ListItem>
+                            ))}
+                        </List>
                     </div>
                     {isSpotifyAuthenticated && (
                         <div className="d-flex">
                             <div className="ms-auto">
                                 <Label
-                                    icon={<SpotifyIcon />}
+                                    icon={<SpotifyIcon/>}
                                     variant="outline"
                                     onClick={() => handleModalToggle()}
                                     className="mt-5">
