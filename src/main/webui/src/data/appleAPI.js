@@ -6,69 +6,19 @@ export const fetchGreeting = async () => {
     return response.text();
 };
 
-// Fetch all the library songs in alphabetical order.
-export const fetchSongs = async () => {
-    return fetchData('https://api.music.apple.com/v1/me/library/songs?l=en');
-};
-
-// Fetch the resources in heavy rotation for the user.
-export const fetchHeavyRotation = async () => {
-    return fetchData('https://api.music.apple.com/v1/me/history/heavy-rotation?l=en');
-};
-
-// Fetch the recently played tracks for the user.
-export const fetchRecentlyPlayedTracks = async () => {
-    return fetchData('https://api.music.apple.com/v1/me/recent/played/tracks?l=en');
-};
-
-// Fetch all the catalog playlists in alphabetical order
-export const fetchChartsPlaylists = async () => {
-    return fetchData('https://api.music.apple.com/v1/catalog/us/playlists?filter[storefront-chart]=us');
-};
-
-// Fetch the current user’s personal Apple Music station.
-export const fetchMyStation = async () => {
-    return fetchData('https://api.music.apple.com/v1/catalog/kr/stations?filter[identity]=personal');
-};
-
-// Fetch all the library albums in alphabetical order.
-export const fetchLibraryAlbums = async () => {
-    return fetchData('https://api.music.apple.com/v1/me/library/albums?limit=10');
-};
-
-// Fetch a library album’s relationship by using its identifier.
-export const fetchLibraryAlbumRelationByName = async (id, relation) => {
-    return fetchData(`https://api.music.apple.com/v1/me/library/albums/${String(id)}/${relation}`);
-};
-
-// Fetch an album’s relationship by using its identifier.
-export const fetchCatalogAlbumRelationByName = async (id, relation) => {
-    return fetchData(`https://api.music.apple.com/v1/catalog/kr/albums/${String(id)}/${relation}`);
-};
-
 // Fetch all the library playlists in alphabetical order.
 export const fetchLibraryPlaylists = async () => {
-    return fetchData('https://api.music.apple.com/v1/me/library/playlists?l=en');
-};
-
-// Fetch a playlist’s relationship by using its identifier.
-export const fetchCatalogPlaylistRelationByName = async (id, relation) => {
-    return fetchData(`https://api.music.apple.com/v1/catalog/kr/playlists/${String(id)}/${relation}`);
+    return fetchData('/api/apple/fetchLibraryPlaylists');
 };
 
 // Fetch a library playlist’s relationship by using its identifier.
 export const fetchLibraryPlaylistRelationByName = async (id, relation) => {
-    return fetchData(`https://api.music.apple.com/v1/me/library/playlists/${String(id)}/${relation}?include=catalog`);
+    return fetchData(`/api/apple/fetchLibraryPlaylistRelationByName/${String(id)}/${relation}`);
 }
-
-// Fetch default recommendations.
-export const fetchRecommendations = async () => {
-    return fetchData('https://api.music.apple.com/v1/me/recommendations?l=en');
-};
 
 // Fetch one or more songs by using their International Standard Recording Code (ISRC) values.
 export const fetchMultipleCatalogSongsByISRC = async (isrc) => {
-    return fetchData(`https://api.music.apple.com/v1/catalog/kr/songs?filter[isrc]=${isrc}`);
+    return fetchData(`/api/apple/fetchMultipleCatalogSongsByISRC?isrc=${isrc}`);
 }
 
 // Create a new playlist in a user’s library.

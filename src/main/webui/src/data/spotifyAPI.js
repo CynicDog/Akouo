@@ -1,19 +1,19 @@
 // Get a list of the playlists owned or followed by the current Spotify user.
 export const getCurrentUserPlaylists = async () => {
-    return fetchData( `/getCurrentUserPlaylists`);
+    return fetchData( `/api/spotify/getCurrentUserPlaylists`);
 };
 
 export const getPlaylist = async (playlistId) => {
-    return fetchData(`/getPlaylist/${playlistId}`);
+    return fetchData(`/api/spotify/getPlaylist/${playlistId}`);
 }
 
 // Search tracks by ISRC code
 export const searchForItem = async (isrc) => {
-    return fetchData(`/searchForItem?isrc=${isrc}`);
+    return fetchData(`/api/spotify/searchForItem?isrc=${isrc}`);
 }
 
 export const getPlaylistItem = async (playlistId, type) => {
-    return fetchData(`/getPlaylistItem/${playlistId}/${type}`)
+    return fetchData(`/api/spotify/getPlaylistItem/${playlistId}/${type}`)
 }
 
 export const createPlaylist = async (userId, name, description, isPublic, tracks) => {
@@ -34,7 +34,7 @@ export const createPlaylist = async (userId, name, description, isPublic, tracks
         "uris": uris
     });
 
-    const response = await fetch(`/createPlaylist`, {
+    const response = await fetch(`/api/spotify/createPlaylist`, {
         method: 'POST',
         headers: headers,
         body: body,

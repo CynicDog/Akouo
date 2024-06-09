@@ -230,6 +230,7 @@ public class SpotifyAPI {
     }
 
     public void getPlaylist(RoutingContext ctx) {
+
         String accessToken = validateAccessToken(ctx);
         if (accessToken == null) return;
 
@@ -245,6 +246,7 @@ public class SpotifyAPI {
     }
 
     public void searchForItem(RoutingContext ctx) {
+
         String accessToken = validateAccessToken(ctx);
         if (accessToken == null) return;
 
@@ -261,6 +263,7 @@ public class SpotifyAPI {
     }
 
     public void getPlaylistItem(RoutingContext ctx) {
+
         String accessToken = validateAccessToken(ctx);
         if (accessToken == null) return;
 
@@ -278,6 +281,7 @@ public class SpotifyAPI {
     }
 
     public void createPlaylist(RoutingContext ctx) {
+
         String accessToken = validateAccessToken(ctx);
         if (accessToken == null) return;
 
