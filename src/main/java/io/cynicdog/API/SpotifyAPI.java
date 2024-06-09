@@ -1,8 +1,5 @@
 package io.cynicdog.API;
 
-import io.cynicdog.util.CircuitBreakerService;
-import io.github.resilience4j.circuitbreaker.CircuitBreaker;
-import io.vertx.core.Future;
 import io.vertx.core.MultiMap;
 import io.vertx.core.Vertx;
 import io.vertx.core.http.Cookie;
@@ -13,13 +10,10 @@ import io.vertx.ext.auth.oauth2.OAuth2AuthorizationURL;
 import io.vertx.ext.auth.oauth2.OAuth2Options;
 import io.vertx.ext.web.RoutingContext;
 import io.vertx.ext.web.client.WebClient;
-import io.vertx.ext.web.codec.BodyCodec;
 import org.jboss.logging.Logger;
 
 import java.util.Arrays;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CompletionStage;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import static io.cynicdog.util.SecureStringUtil.encodeBase64;
@@ -32,8 +26,6 @@ public class SpotifyAPI {
     public static String stateKey = "STATE";
 
     final Vertx vertx;
-    final CircuitBreakerService circuitBreakerService;
-    final CircuitBreaker circuitBreaker;
     final String host;
     final int port;
 
@@ -42,10 +34,9 @@ public class SpotifyAPI {
     final String redirectUri;
     final OAuth2Options credentials;
 
-    public SpotifyAPI(Vertx vertx, CircuitBreakerService circuitBreakerService, String host, int port, String CLIENT_ID, String CLIENT_SECRET, String redirectUri) {
+    public SpotifyAPI(Vertx vertx, String host, int port, String CLIENT_ID, String CLIENT_SECRET, String redirectUri) {
 
         this.vertx = vertx;
-        this.circuitBreakerService = circuitBreakerService;
         this.host = host;
         this.port = port;
 
@@ -59,8 +50,6 @@ public class SpotifyAPI {
                 .setTokenPath("/api/token")
                 .setClientId(CLIENT_ID)
                 .setClientSecret(CLIENT_SECRET);
-
-        this.circuitBreaker = circuitBreakerService.getCircuitBreaker("spotify");
     }
 
     private String validateAccessToken(RoutingContext ctx) {
@@ -81,29 +70,19 @@ public class SpotifyAPI {
 
         WebClient client = WebClient.create(vertx);
 
-        circuitBreaker.executeSupplier(() -> {
-            return client.getAbs(remoteUrl)
-                    .putHeader("Authorization", "Bearer " + accessToken)
-                    .as(BodyCodec.jsonObject())
-                    .send()
-                    .map(response -> {
-                        if (response.statusCode() == 404) { // Assuming 404 indicates a misspelled URL
-                            throw new RuntimeException("Invalid URL: " + remoteUrl);
-                        }
-                        return response.body();
-                    })
-                    .toCompletionStage();
-        }).whenComplete((response, throwable) -> {
-            if (throwable != null) {
-                ctx.response()
-                        .setStatusCode(500)
-                        .end(new JsonObject().put("error", throwable.getMessage()).encode());
-            } else {
-                ctx.response()
-                        .putHeader("Content-Type", "application/json")
-                        .end(response.encode());
-            }
-        });
+        client.getAbs(remoteUrl)
+                .putHeader("Authorization", "Bearer " + accessToken)
+                .send(ar -> {
+                    if (ar.succeeded()) {
+                        ctx.response()
+                                .putHeader("Content-Type", "application/json")
+                                .end(ar.result().bodyAsJsonObject().encode());
+                    } else {
+                        ctx.response()
+                                .setStatusCode(500)
+                                .end(new JsonObject().put("error", ar.cause().getMessage()).encode());
+                    }
+                });
     }
 
     private CompletableFuture<JsonObject> getSpotifyAccessToken(WebClient client, String code) {
@@ -328,23 +307,20 @@ public class SpotifyAPI {
                 .put("description", description)
                 .put("public", isPublic);
 
-        circuitBreaker.executeCompletionStage(() -> {
-            return client.postAbs(url)
-                    .putHeader("Authorization", "Bearer " + accessToken)
-                    .putHeader("Content-Type", "application/json")
-                    .sendJsonObject(body)
-                    .map(response -> response.bodyAsJsonObject())
-                    .toCompletionStage();
-        }).whenComplete((playlist, throwable) -> {
-            if (throwable != null) {
-                ctx.response()
-                        .setStatusCode(500)
-                        .end(new JsonObject().put("error", throwable.getMessage()).encode());
-            } else {
-                String playlistId = playlist.getString("id");
-                addTracksToPlaylist(ctx, client, accessToken, playlistId, uris, playlist);
-            }
-        });
+        client.postAbs(url)
+                .putHeader("Authorization", "Bearer " + accessToken)
+                .putHeader("Content-Type", "application/json")
+                .sendJsonObject(body, ar -> {
+                    if (ar.succeeded()) {
+                        JsonObject playlist = ar.result().bodyAsJsonObject();
+                        String playlistId = playlist.getString("id");
+                        addTracksToPlaylist(ctx, client, accessToken, playlistId, uris, playlist);
+                    } else {
+                        ctx.response()
+                                .setStatusCode(500)
+                                .end(new JsonObject().put("error", ar.cause().getMessage()).encode());
+                    }
+                });
     }
 
     private void addTracksToPlaylist(RoutingContext ctx, WebClient client, String accessToken, String playlistId, JsonArray uris, JsonObject playlist) {
@@ -352,23 +328,19 @@ public class SpotifyAPI {
         JsonObject body = new JsonObject()
                 .put("uris", uris);
 
-        circuitBreaker.executeCompletionStage(() -> {
-            return client.postAbs(url)
-                    .putHeader("Authorization", "Bearer " + accessToken)
-                    .putHeader("Content-Type", "application/json")
-                    .sendJsonObject(body)
-                    .map(response -> response.bodyAsJsonObject())
-                    .toCompletionStage();
-        }).whenComplete((ignored, throwable) -> {
-            if (throwable != null) {
-                ctx.response()
-                        .setStatusCode(500)
-                        .end(new JsonObject().put("error", throwable.getMessage()).encode());
-            } else {
-                ctx.response()
-                        .setStatusCode(200)
-                        .end(playlist.encode());
-            }
-        });
+        client.postAbs(url)
+                .putHeader("Authorization", "Bearer " + accessToken)
+                .putHeader("Content-Type", "application/json")
+                .sendJsonObject(body, ar -> {
+                    if (ar.succeeded()) {
+                        ctx.response()
+                                .setStatusCode(200)
+                                .end(playlist.encode());
+                    } else {
+                        ctx.response()
+                                .setStatusCode(500)
+                                .end(new JsonObject().put("error", ar.cause().getMessage()).encode());
+                    }
+                });
     }
 }

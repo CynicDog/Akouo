@@ -46,8 +46,8 @@ public class RouterRegistry {
 
         router.route().handler(BodyHandler.create());
 
-        var spotifyAPI = new SpotifyAPI(vertx, circuitBreaker, host, port, CLIENT_ID, CLIENT_SECRET, redirectUri);
-        var appleMusicAPI = new AppleMusicAPI(vertx, circuitBreaker, developerToken);
+        var spotifyAPI = new SpotifyAPI(vertx, host, port, CLIENT_ID, CLIENT_SECRET, redirectUri);
+        var appleMusicAPI = new AppleMusicAPI(vertx, developerToken);
 
         router.get("/login").handler(spotifyAPI::login);
         router.get("/callback").handler(spotifyAPI::callback);
