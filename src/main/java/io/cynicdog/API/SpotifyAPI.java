@@ -33,6 +33,7 @@ public class SpotifyAPI {
 
     final Vertx vertx;
     final CircuitBreakerService circuitBreakerService;
+    final CircuitBreaker circuitBreaker;
     final String host;
     final int port;
 
@@ -58,6 +59,8 @@ public class SpotifyAPI {
                 .setTokenPath("/api/token")
                 .setClientId(CLIENT_ID)
                 .setClientSecret(CLIENT_SECRET);
+
+        this.circuitBreaker = circuitBreakerService.getCircuitBreaker("spotify");
     }
 
     private String validateAccessToken(RoutingContext ctx) {
@@ -77,14 +80,18 @@ public class SpotifyAPI {
     private void fetchData(RoutingContext ctx, String remoteUrl, String accessToken) {
 
         WebClient client = WebClient.create(vertx);
-        CircuitBreaker circuitBreaker = circuitBreakerService.getCircuitBreaker("spotify");
 
         circuitBreaker.executeSupplier(() -> {
             return client.getAbs(remoteUrl)
                     .putHeader("Authorization", "Bearer " + accessToken)
                     .as(BodyCodec.jsonObject())
                     .send()
-                    .map(response -> response.body())
+                    .map(response -> {
+                        if (response.statusCode() == 404) { // Assuming 404 indicates a misspelled URL
+                            throw new RuntimeException("Invalid URL: " + remoteUrl);
+                        }
+                        return response.body();
+                    })
                     .toCompletionStage();
         }).whenComplete((response, throwable) -> {
             if (throwable != null) {
@@ -321,8 +328,6 @@ public class SpotifyAPI {
                 .put("description", description)
                 .put("public", isPublic);
 
-        CircuitBreaker circuitBreaker = circuitBreakerService.getCircuitBreaker("spotify");
-
         circuitBreaker.executeCompletionStage(() -> {
             return client.postAbs(url)
                     .putHeader("Authorization", "Bearer " + accessToken)
@@ -346,8 +351,6 @@ public class SpotifyAPI {
         String url = "https://api.spotify.com/v1/playlists/" + playlistId + "/tracks";
         JsonObject body = new JsonObject()
                 .put("uris", uris);
-
-        CircuitBreaker circuitBreaker = circuitBreakerService.getCircuitBreaker("spotify");
 
         circuitBreaker.executeCompletionStage(() -> {
             return client.postAbs(url)

@@ -1,6 +1,6 @@
 import React from "react";
 import {useAuth} from "../../Context.jsx";
-import {Label, List, ListItem, Spinner, Tooltip} from "@patternfly/react-core";
+import {HelperText, HelperTextItem, Label, List, ListItem, Spinner, Tooltip} from "@patternfly/react-core";
 import SearchModal from "../SearchModal.jsx";
 import AppleIcon from "../../../public/apple.jsx";
 import {useQuery} from "react-query";
@@ -25,12 +25,14 @@ const PlaylistDetail = ({playlist, height = 400, fromModal = false}) => {
         setIsModalOpen(prevIsModalOpen => !prevIsModalOpen);
     };
 
-    const {data: tracks, isLoading: isTrackLoading} = useQuery(
+    const {data: tracks, isLoading: isTrackLoading, isError} = useQuery(
         ['spotifyPlaylistTracks', playlist.id],
         () => getPlaylistItem(playlist.id, 'tracks'),
         {
             enabled: !!playlist.id,
-            staleTime: 7_200_000 // 2 hours
+            staleTime: 7_200_000, // 2 hours
+            retry: 2,
+            retryDelay: 3000, // 3 seconds
         }
     );
 
@@ -40,6 +42,12 @@ const PlaylistDetail = ({playlist, height = 400, fromModal = false}) => {
                 <div className="d-flex justify-content-center">
                     <Spinner/>
                 </div>
+            ) : isError ? (
+                <HelperText>
+                    <HelperTextItem variant="error" hasIcon>
+                        An error occurred while fetching search results.
+                    </HelperTextItem>
+                </HelperText>
             ) : (
             <List isPlain isBordered style={{height: '250px', overflowY: 'auto'}}>
                 {tracks.items.map((track, index) => (

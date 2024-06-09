@@ -22,6 +22,7 @@ public class CircuitBreakerService {
             addRegistryEvent();
             circuitBreaker = circuitBreakerRegistry.circuitBreaker(entryName);
 
+            // TODO: failure recognition
             circuitBreaker.getEventPublisher()
                     .onSuccess(event -> logger.info("Success call"))
                     .onError(event -> logger.error("Failed call"))

@@ -53,41 +53,9 @@ export const createLibraryPlaylist = async (name, description, isPublic, tracks)
 
     const playlist = await response.json();
 
-//    await addTracksToLibraryPlaylist(playlist.data[0].id, tracks);
-
     return playlist.data[0];
 }
 
-// will be performed in server
-// // A request to add tracks to a library playlist.
-// export const addTracksToLibraryPlaylist = async (playlistId, tracks) => {
-//
-//     const tracksData = tracks.map(track => ({
-//         id: track.data[0].id,
-//         type: "songs"
-//     }));
-//
-//     const url = `https://api.music.apple.com/v1/me/library/playlists/${playlistId}/tracks`
-//
-//     const body = {
-//         data: tracksData
-//     }
-//
-//     const response = await fetch(url, {
-//         method: 'POST',
-//         headers: {
-//             'Authorization': `Bearer ${sessionStorage.getItem("DT")}`,
-//             'Music-User-Token': sessionStorage.getItem("MUT")
-//         },
-//         body: JSON.stringify(body)
-//     });
-//
-//     if (!response.ok) {
-//         throw new Error(`HTTP error! status: ${response.status}`);
-//     }
-//
-//     return response.json();
-// }
 
 const fetchData = async (url) => {
 

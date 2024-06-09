@@ -18,6 +18,7 @@ public class AppleMusicAPI {
 
     final Vertx vertx;
     final CircuitBreakerService circuitBreakerService;
+    final CircuitBreaker circuitBreaker;
     final String developerToken;
 
     @Inject
@@ -25,11 +26,11 @@ public class AppleMusicAPI {
         this.vertx = vertx;
         this.circuitBreakerService = circuitBreakerService;
         this.developerToken = developerToken;
+        this.circuitBreaker = circuitBreakerService.getCircuitBreaker("apple-music");
     }
 
     private void fetchData(RoutingContext ctx, String remoteUrl, String musicUserToken) {
         WebClient client = WebClient.create(vertx);
-        CircuitBreaker circuitBreaker = circuitBreakerService.getCircuitBreaker("apple-music");
 
         circuitBreaker.executeSupplier(() -> {
             return client.getAbs(remoteUrl)
@@ -37,7 +38,12 @@ public class AppleMusicAPI {
                     .putHeader("Music-User-Token", musicUserToken)
                     .as(BodyCodec.jsonObject())
                     .send()
-                    .map(response -> response.body())
+                    .map(response -> {
+                        if (response.statusCode() == 404) { // Assuming 404 indicates a misspelled URL
+                            throw new RuntimeException("Invalid URL: " + remoteUrl);
+                        }
+                        return response.body();
+                    })
                     .toCompletionStage();
         }).whenComplete((response, throwable) -> {
             if (throwable != null) {
@@ -132,8 +138,6 @@ public class AppleMusicAPI {
                         .put("public", isPublic)
                 );
 
-        CircuitBreaker circuitBreaker = circuitBreakerService.getCircuitBreaker("apple-music");
-
         circuitBreaker.executeSupplier(() -> {
             return client.postAbs("https://api.music.apple.com/v1/me/library/playlists")
                     .putHeader("Authorization", "Bearer " + developerToken)
@@ -158,8 +162,6 @@ public class AppleMusicAPI {
         String url = "https://api.music.apple.com/v1/me/library/playlists/" + playlistId + "/tracks";
         JsonObject body = new JsonObject()
                 .put("data", data);
-
-        CircuitBreaker circuitBreaker = circuitBreakerService.getCircuitBreaker("apple-music");
 
         circuitBreaker.executeSupplier(() -> {
             return client.postAbs(url)

@@ -18,10 +18,12 @@ public class CircuitBreakerConfiguration {
 
     private CircuitBreakerConfig configurationCircuitBreaker() {
         return CircuitBreakerConfig.custom()
-                .failureRateThreshold(50)
-                .waitDurationInOpenState(Duration.ofMillis(7000)) // 7 seconds
+                .failureRateThreshold(30)
+                .minimumNumberOfCalls(5)
+                .slowCallDurationThreshold(Duration.ofSeconds(4))
+                .waitDurationInOpenState(Duration.ofSeconds(7)) // 7 seconds
                 .permittedNumberOfCallsInHalfOpenState(3)
-                .slidingWindowSize(10)
+                .slidingWindowSize(100)
                 .recordExceptions(RuntimeException.class)
                 .build();
     }

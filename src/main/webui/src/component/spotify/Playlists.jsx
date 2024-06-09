@@ -5,7 +5,7 @@ import {
     Drawer,
     DrawerContent,
     DrawerContentBody, DrawerHead, DrawerPanelContent,
-    ExpandableSection,
+    ExpandableSection, HelperText, HelperTextItem,
     Label,
     List, ListItem,
     Spinner,
@@ -22,10 +22,14 @@ const Playlists = () => {
     };
 
 
-    const {data: spotifyPlaylists = [], isLoading: isSpotifyPlaylistLoading} = useQuery(
+    const {data: spotifyPlaylists = [], isLoading: isSpotifyPlaylistLoading, isError} = useQuery(
         'spotifyPlaylists',
         () => getCurrentUserPlaylists(),
-        {enabled: !!sessionStorage.getItem("ACCESS_TOKEN")}
+        {
+            enabled: !!sessionStorage.getItem("ACCESS_TOKEN",),
+            retry: 2,
+            retryDelay: 3000, // 3 seconds
+        }
     );
 
     return (
@@ -34,8 +38,13 @@ const Playlists = () => {
                 <div className="d-flex justify-content-center">
                     <Spinner/>
                 </div>
+            ) : isError ? (
+                <HelperText>
+                    <HelperTextItem variant="error" hasIcon>
+                        An error occurred while fetching search results.
+                    </HelperTextItem>
+                </HelperText>
             ) : (
-
                 <div className="my-3">
                     <ExpandableSection
                         toggleContent={

@@ -10,7 +10,7 @@ import {
     ExpandableSection,
     Badge,
     DrawerHead,
-    DrawerPanelContent, Drawer, DrawerContent, DrawerContentBody
+    DrawerPanelContent, Drawer, DrawerContent, DrawerContentBody, HelperText, HelperTextItem
 } from '@patternfly/react-core';
 import SearchModal from "../SearchModal.jsx";
 import SpotifyIcon from "../../../public/spotify.jsx";
@@ -23,10 +23,14 @@ function Playlists() {
         setIsExpanded(isExpanded);
     };
 
-    const {data: applePlaylists = [], isLoading: isApplePlaylistLoading} = useQuery(
+    const {data: applePlaylists = [], isLoading: isApplePlaylistLoading, isError} = useQuery(
         'applePlaylists',
         () => fetchLibraryPlaylists(),
-        {enabled: !!sessionStorage.getItem("MUT")}
+        {
+            enabled: !!sessionStorage.getItem("MUT"),
+            retry: 2,
+            retryDelay: 3000, // 3 seconds
+        }
     );
 
     return (
@@ -35,6 +39,12 @@ function Playlists() {
                 <div className="d-flex justify-content-center">
                     <Spinner/>
                 </div>
+            ) : isError ? (
+                <HelperText>
+                    <HelperTextItem variant="error" hasIcon>
+                        An error occurred while fetching search results.
+                    </HelperTextItem>
+                </HelperText>
             ) : (
                 <div className="my-3">
                     <ExpandableSection
@@ -133,12 +143,14 @@ const PlaylistDetail = ({playlist}) => {
         setIsModalOpen(prevIsModalOpen => !prevIsModalOpen);
     };
 
-    const {data: tracks, isLoading: isTrackLoading} = useQuery(
+    const {data: tracks, isLoading: isTrackLoading, isError} = useQuery(
         ['applePlaylistTracks', playlist.id],
         () => fetchLibraryPlaylistRelationByName(playlist.id, 'tracks'),
         {
             enabled: !!playlist.id,
-            staleTime: 7_200_000 // 2 hours
+            staleTime: 7_200_000, // 2 hours
+            retry: 2,
+            retryDelay: 3000, // 3 seconds
         }
     );
 
@@ -148,6 +160,12 @@ const PlaylistDetail = ({playlist}) => {
                 <div className="d-flex justify-content-center">
                     <Spinner/>
                 </div>
+            ) : isError ? (
+                <HelperText>
+                    <HelperTextItem variant="error" hasIcon>
+                        An error occurred while fetching search results.
+                    </HelperTextItem>
+                </HelperText>
             ) : (
                 <>
                     <div className="row">
