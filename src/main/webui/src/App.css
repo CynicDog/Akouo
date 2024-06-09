@@ -70,3 +70,13 @@ apple-music-card-player {
    align-items: center;
    justify-content: center;
 }
+
+:where(img,
+embed,
+iframe,
+object,
+audio,
+video) {
+  max-width: 100%; !important;
+  height: 400px; !important;
+}
