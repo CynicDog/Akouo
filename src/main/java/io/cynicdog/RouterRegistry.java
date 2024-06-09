@@ -1,18 +1,14 @@
 package io.cynicdog;
 
-import io.cynicdog.API.OAuthAPI;
+import io.cynicdog.API.SpotifyAPI;
 import io.vertx.core.Vertx;
-import io.vertx.ext.bridge.PermittedOptions;
 import io.vertx.ext.web.Router;
-import io.vertx.ext.web.handler.sockjs.SockJSBridgeOptions;
-import io.vertx.ext.web.handler.sockjs.SockJSHandler;
+import io.vertx.ext.web.handler.BodyHandler;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.event.Observes;
 import jakarta.inject.Inject;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.jboss.logging.Logger;
-
-import java.util.concurrent.atomic.AtomicInteger;
 
 
 @ApplicationScoped
@@ -36,10 +32,17 @@ public class RouterRegistry {
             ctx.next();
         });
 
-        var OAuthAPI = new OAuthAPI(vertx, host, port, CLIENT_ID, CLIENT_SECRET, redirectUri);
+        router.route().handler(BodyHandler.create());
 
-        router.get("/login").handler(OAuthAPI::login);
-        router.get("/callback").handler(OAuthAPI::callback);
+        var spotifyAPI = new SpotifyAPI(vertx, host, port, CLIENT_ID, CLIENT_SECRET, redirectUri);
+
+        router.get("/login").handler(spotifyAPI::login);
+        router.get("/callback").handler(spotifyAPI::callback);
+        router.get("/getCurrentUserPlaylists").handler(spotifyAPI::getCurrentUserPlaylists);
+        router.get("/getPlaylist/:playlistId").handler(spotifyAPI::getPlaylist);
+        router.get("/searchForItem").handler(spotifyAPI::searchForItem);
+        router.get("/getPlaylistItem/:playlistId/:type").handler(spotifyAPI::getPlaylistItem);
+        router.post("/createPlaylist").handler(spotifyAPI::createPlaylist);
 
         router.get("/greeting").handler(ctx ->
                 ctx.response().end("Welcome to Akouo 🎶 <br/ > Your gateway to a seamless journey of music exploration and connection!")
