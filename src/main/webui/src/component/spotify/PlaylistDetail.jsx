@@ -1,6 +1,6 @@
 import React from "react";
 import {useAuth} from "../../Context.jsx";
-import {Label} from "@patternfly/react-core";
+import {Label, List, ListItem, Spinner, Tooltip} from "@patternfly/react-core";
 import SearchModal from "../SearchModal.jsx";
 import AppleIcon from "../../../public/apple.jsx";
 import {useQuery} from "react-query";
@@ -36,15 +36,31 @@ const PlaylistDetail = ({playlist, height = 400, fromModal = false}) => {
 
     return (
         <div className="m-3">
-            <iframe
-                width="100%"
-                height={height}
-                style={{borderRadius: "20px"}}
-                title="Spotify Embed: My Path to Spotify: Women in Engineering"
-                frameBorder="0"
-                allowFullScreen
-                allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
-                src={parseSpotifyURI(playlist.uri)}/>
+            {isTrackLoading ? (
+                <div className="d-flex justify-content-center">
+                    <Spinner/>
+                </div>
+            ) : (
+            <List isPlain isBordered style={{height: '250px', overflowY: 'auto'}}>
+                {tracks.items.map((track, index) => (
+                    <ListItem className="fw-lighter" key={index}>
+                        <div className="fw-light">
+                            {track.track.name} {' '}
+                            <Tooltip content={<div>{track.track.artists[0].name}</div>}>
+                                <Label textMaxWidth="100px" isCompact>
+                                    {track.track.artists[0].name}
+                                </Label>
+                            </Tooltip>{' '}
+                            <Tooltip content={<div>{track.track.album.name}</div>}>
+                                <Label isCompact textMaxWidth="100px" color="blue">
+                                    {track.track.album.name}
+                                </Label>
+                            </Tooltip>
+                        </div>
+                    </ListItem>
+                ))}
+            </List>
+            )}
             {isAppleAuthenticated && !isTrackLoading && !fromModal && (
                 <div>
                     <div className="d-flex">
