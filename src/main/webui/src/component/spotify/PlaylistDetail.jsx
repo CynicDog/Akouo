@@ -1,13 +1,12 @@
 import React from "react";
 import {useAuth} from "../../Context.jsx";
-import {Label} from "@patternfly/react-core";
-import SpotifyIcon from "../../../public/spotify.jsx";
-import SearchModal from "../apple/SearchModal.jsx";
+import {HelperText, HelperTextItem, Label, List, ListItem, Spinner, Tooltip} from "@patternfly/react-core";
+import SearchModal from "../SearchModal.jsx";
 import AppleIcon from "../../../public/apple.jsx";
 import {useQuery} from "react-query";
 import {getPlaylistItem} from "../../data/spotifyAPI.js";
 
-const PlaylistDetail = ({playlist, height = 400}) => {
+const PlaylistDetail = ({playlist, height = 400, fromModal = false}) => {
 
     const {isAppleAuthenticated} = useAuth();
 
@@ -26,27 +25,51 @@ const PlaylistDetail = ({playlist, height = 400}) => {
         setIsModalOpen(prevIsModalOpen => !prevIsModalOpen);
     };
 
-    const {data: tracks, isLoading: isTrackLoading} = useQuery(
+    const {data: tracks, isLoading: isTrackLoading, isError} = useQuery(
         ['spotifyPlaylistTracks', playlist.id],
         () => getPlaylistItem(playlist.id, 'tracks'),
         {
             enabled: !!playlist.id,
-            staleTime: 7_200_000 // 2 hours
+            staleTime: 7_200_000, // 2 hours
+            retry: 2,
+            retryDelay: 3000, // 3 seconds
         }
     );
 
     return (
         <div className="m-3">
-            <iframe
-                width="100%"
-                height={height}
-                style={{borderRadius: "20px"}}
-                title="Spotify Embed: My Path to Spotify: Women in Engineering"
-                frameBorder="0"
-                allowFullScreen
-                allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
-                src={parseSpotifyURI(playlist.uri)}/>
-            {isAppleAuthenticated && !isTrackLoading && (
+            {isTrackLoading ? (
+                <div className="d-flex justify-content-center">
+                    <Spinner/>
+                </div>
+            ) : isError ? (
+                <HelperText>
+                    <HelperTextItem variant="error" hasIcon>
+                        An error occurred while fetching search results.
+                    </HelperTextItem>
+                </HelperText>
+            ) : (
+            <List isPlain isBordered style={{height: '250px', overflowY: 'auto'}}>
+                {tracks.items.map((track, index) => (
+                    <ListItem className="fw-lighter" key={index}>
+                        <div className="fw-light">
+                            {track.track.name} {' '}
+                            <Tooltip content={<div>{track.track.artists[0].name}</div>}>
+                                <Label textMaxWidth="100px" isCompact>
+                                    {track.track.artists[0].name}
+                                </Label>
+                            </Tooltip>{' '}
+                            <Tooltip content={<div>{track.track.album.name}</div>}>
+                                <Label isCompact textMaxWidth="100px" color="blue">
+                                    {track.track.album.name}
+                                </Label>
+                            </Tooltip>
+                        </div>
+                    </ListItem>
+                ))}
+            </List>
+            )}
+            {isAppleAuthenticated && !isTrackLoading && !fromModal && (
                 <div>
                     <div className="d-flex">
                         <div className="ms-auto">

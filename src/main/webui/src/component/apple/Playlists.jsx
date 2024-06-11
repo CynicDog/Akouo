@@ -10,9 +10,9 @@ import {
     ExpandableSection,
     Badge,
     DrawerHead,
-    DrawerPanelContent, Drawer, DrawerContent, DrawerContentBody
+    DrawerPanelContent, Drawer, DrawerContent, DrawerContentBody, HelperText, HelperTextItem
 } from '@patternfly/react-core';
-import SearchModal from "./SearchModal.jsx";
+import SearchModal from "../SearchModal.jsx";
 import SpotifyIcon from "../../../public/spotify.jsx";
 import {useAuth} from "../../Context.jsx";
 
@@ -23,10 +23,14 @@ function Playlists() {
         setIsExpanded(isExpanded);
     };
 
-    const {data: applePlaylists = [], isLoading: isApplePlaylistLoading} = useQuery(
+    const {data: applePlaylists = [], isLoading: isApplePlaylistLoading, isError} = useQuery(
         'applePlaylists',
         () => fetchLibraryPlaylists(),
-        {enabled: !!sessionStorage.getItem("MUT")}
+        {
+            enabled: !!sessionStorage.getItem("MUT"),
+            retry: 2,
+            retryDelay: 3000, // 3 seconds
+        }
     );
 
     return (
@@ -35,6 +39,12 @@ function Playlists() {
                 <div className="d-flex justify-content-center">
                     <Spinner/>
                 </div>
+            ) : isError ? (
+                <HelperText>
+                    <HelperTextItem variant="error" hasIcon>
+                        An error occurred while fetching search results.
+                    </HelperTextItem>
+                </HelperText>
             ) : (
                 <div className="my-3">
                     <ExpandableSection
@@ -133,12 +143,14 @@ const PlaylistDetail = ({playlist}) => {
         setIsModalOpen(prevIsModalOpen => !prevIsModalOpen);
     };
 
-    const {data: tracks, isLoading: isTrackLoading} = useQuery(
+    const {data: tracks, isLoading: isTrackLoading, isError} = useQuery(
         ['applePlaylistTracks', playlist.id],
         () => fetchLibraryPlaylistRelationByName(playlist.id, 'tracks'),
         {
             enabled: !!playlist.id,
-            staleTime: 7_200_000 // 2 hours
+            staleTime: 7_200_000, // 2 hours
+            retry: 2,
+            retryDelay: 3000, // 3 seconds
         }
     );
 
@@ -148,44 +160,44 @@ const PlaylistDetail = ({playlist}) => {
                 <div className="d-flex justify-content-center">
                     <Spinner/>
                 </div>
+            ) : isError ? (
+                <HelperText>
+                    <HelperTextItem variant="error" hasIcon>
+                        An error occurred while fetching search results.
+                    </HelperTextItem>
+                </HelperText>
             ) : (
                 <>
                     <div className="row">
-                        <div className="col-lg-4">
-                            <apple-music-artwork-lockup type="playlist"
-                                                        content-id={playlist.attributes.playParams.globalId}
-                                                        width="250"/>
-                        </div>
-                        <div className="col-lg-8">
-                            <List isPlain isBordered style={{height: '250px', overflowY: 'auto'}}>
-                                {tracks.data.map((track, index) => (
-                                    <ListItem className="fw-lighter" key={index}>
-                                        <div className="fw-light">
-                                            {track.attributes.name} {' '}
-                                            <Label isCompact>
-                                                {track.attributes.genreNames.join(",")}
-                                            </Label>{' '}
-                                            <Tooltip content={<div>{track.attributes.artistName}</div>}>
-                                                <Label textMaxWidth="100px" isCompact>
-                                                    {track.attributes.artistName}
-                                                </Label>
-                                            </Tooltip>{' '}
-                                            <Tooltip content={<div>{track.attributes.albumName}</div>}>
-                                                <Label isCompact textMaxWidth="100px" color="blue">
-                                                    {track.attributes.albumName}
-                                                </Label>
-                                            </Tooltip>
-                                        </div>
-                                    </ListItem>
-                                ))}
-                            </List>
-                        </div>
+
+                        <List isPlain isBordered style={{height: '250px', overflowY: 'auto'}}>
+                            {tracks.data.map((track, index) => (
+                                <ListItem className="fw-lighter" key={index}>
+                                    <div className="fw-light">
+                                        {track.attributes.name} {' '}
+                                        <Label isCompact>
+                                            {track.attributes.genreNames.join(",")}
+                                        </Label>{' '}
+                                        <Tooltip content={<div>{track.attributes.artistName}</div>}>
+                                            <Label textMaxWidth="100px" isCompact>
+                                                {track.attributes.artistName}
+                                            </Label>
+                                        </Tooltip>{' '}
+                                        <Tooltip content={<div>{track.attributes.albumName}</div>}>
+                                            <Label isCompact textMaxWidth="100px" color="blue">
+                                                {track.attributes.albumName}
+                                            </Label>
+                                        </Tooltip>
+                                    </div>
+                                </ListItem>
+                            ))}
+                        </List>
                     </div>
                     {isSpotifyAuthenticated && (
                         <div className="d-flex">
                             <div className="ms-auto">
                                 <Label
-                                    icon={<SpotifyIcon />}
+                                    icon={<SpotifyIcon/>}
                                     variant="outline"
                                     onClick={() => handleModalToggle()}
                                     className="mt-5">

@@ -1,42 +1,43 @@
 // Get a list of the playlists owned or followed by the current Spotify user.
 export const getCurrentUserPlaylists = async () => {
-    return fetchData( `https://api.spotify.com/v1/me/playlists`);
+    return fetchData( `/api/spotify/getCurrentUserPlaylists`);
 };
 
 export const getPlaylist = async (playlistId) => {
-    return fetchData(`https://api.spotify.com/v1/playlists/${playlistId}`);
+    return fetchData(`/api/spotify/getPlaylist/${playlistId}`);
 }
 
 // Search tracks by ISRC code
 export const searchForItem = async (isrc) => {
-    return fetchData(`https://api.spotify.com/v1/search?type=track&q=isrc%3A${isrc}&limit=1`);
+    return fetchData(`/api/spotify/searchForItem?isrc=${isrc}`);
 }
 
 export const getPlaylistItem = async (playlistId, type) => {
-    return fetchData(`https://api.spotify.com/v1/playlists/${playlistId}/${type}`)
+    return fetchData(`/api/spotify/getPlaylistItem/${playlistId}/${type}`)
 }
 
-// Create a playlist for a Spotify user
 export const createPlaylist = async (userId, name, description, isPublic, tracks) => {
 
-    var accessToken = sessionStorage.getItem("ACCESS_TOKEN");
+    const accessToken = sessionStorage.getItem("ACCESS_TOKEN");
+    const uris = tracks.flatMap(track => track.tracks.items.map(item => item.uri));
 
-    const url = `https://api.spotify.com/v1/users/${String(userId)}/playlists`;
     const headers = {
         'Authorization': `Bearer ${accessToken}`,
         'Content-Type': 'application/json'
     };
 
     const body = JSON.stringify({
+        "userId": userId,
         "name": name,
         "description": description,
-        "public": isPublic
+        "public": isPublic,
+        "uris": uris
     });
 
-    const response = await fetch(url, {
+    const response = await fetch(`/api/spotify/createPlaylist`, {
         method: 'POST',
         headers: headers,
-        body: body
+        body: body,
     });
 
     if (!response.ok) {
@@ -44,41 +45,9 @@ export const createPlaylist = async (userId, name, description, isPublic, tracks
     }
 
     const playlist = await response.json();
-    const playlistId = playlist.id;
-
-    await addTracksToPlaylist(playlistId, tracks);
 
     return playlist;
 }
-
-// Add one or more items to a user's playlist.
-export const addTracksToPlaylist = async (playlistId, tracks) => {
-
-    var accessToken = sessionStorage.getItem("ACCESS_TOKEN");
-
-    const url = `https://api.spotify.com/v1/playlists/${playlistId}/tracks`;
-    const headers = {
-        'Authorization': `Bearer ${accessToken}`,
-        'Content-Type': 'application/json'
-    };
-
-    const body = JSON.stringify({
-        "uris": tracks.flatMap(track => track.tracks.items.map(item => item.uri))
-    });
-
-    const response = await fetch(url, {
-        method: 'POST',
-        headers: headers,
-        body: body
-    });
-
-    if (!response.ok) {
-        throw new Error(`Failed to add tracks to playlist: ${response.statusText}`);
-    }
-
-    return response.json();
-};
-
 
 const fetchData = async (url) => {
 
