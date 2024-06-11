@@ -41,7 +41,6 @@ export const createLibraryPlaylist = async (name, description, isPublic, tracks)
     const response = await fetch('/api/apple/createLibraryPlaylist', {
         method: 'POST',
         headers: {
-            'Authorization': `Bearer ${sessionStorage.getItem("DT")}`,
             'Music-User-Token': sessionStorage.getItem("MUT")
         },
         body: body
@@ -59,18 +58,13 @@ export const createLibraryPlaylist = async (name, description, isPublic, tracks)
 
 const fetchData = async (url) => {
 
-    var developerToken = sessionStorage.getItem("DT")
     var musicUserToken = sessionStorage.getItem("MUT")
 
-    if (!developerToken) {
-        throw new Error('Developer Token not found');
-    }
     if (!musicUserToken) {
         throw new Error('Music User Token (MUT) not found');
     }
 
     const headers = {
-        'Authorization': `Bearer ${developerToken}`,
         'Music-User-Token': musicUserToken
     };
 

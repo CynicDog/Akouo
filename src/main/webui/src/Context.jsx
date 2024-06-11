@@ -42,9 +42,6 @@ export const AuthProvider = ({ children }) => {
 
     useEffect(() => {
 
-        // TODO: Replace usage of session storage by direct reference to environment variable
-        sessionStorage.setItem("DT", import.meta.env.VITE_APPLE_DEVELOPER_TOKEN);
-
         const spotifyAccessToken = getSpotifyAccessTokenFromCookie();
         if (spotifyAccessToken !== null) {
             sessionStorage.setItem("ACCESS_TOKEN", spotifyAccessToken);
@@ -73,7 +70,7 @@ export const AuthProvider = ({ children }) => {
         try {
             const MusicKit = window.MusicKit;
             await MusicKit.configure({
-                developerToken: sessionStorage.getItem("DT"),
+                developerToken: import.meta.env.VITE_APPLE_DEVELOPER_TOKEN,
                 app: {
                     name: 'Akouo',
                     build: '2024.4.22',
