@@ -45,7 +45,7 @@ const PlaylistDetail = ({playlist, height = 400, fromModal = false}) => {
             ) : isError ? (
                 <HelperText>
                     <HelperTextItem variant="error" hasIcon>
-                        An error occurred while fetching search results.
+                        An error occurred while fetching search results. Possibly too many requests.
                     </HelperTextItem>
                 </HelperText>
             ) : (
@@ -55,12 +55,12 @@ const PlaylistDetail = ({playlist, height = 400, fromModal = false}) => {
                         <div className="fw-light">
                             {track.track.name} {' '}
                             <Tooltip content={<div>{track.track.artists[0].name}</div>}>
-                                <Label textMaxWidth="100px" isCompact>
+                                <Label textMaxWidth="200px" isCompact>
                                     {track.track.artists[0].name}
                                 </Label>
                             </Tooltip>{' '}
                             <Tooltip content={<div>{track.track.album.name}</div>}>
-                                <Label isCompact textMaxWidth="100px" color="blue">
+                                <Label isCompact textMaxWidth="200px" color="blue">
                                     {track.track.album.name}
                                 </Label>
                             </Tooltip>

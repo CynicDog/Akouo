@@ -66,7 +66,7 @@ const SearchedTracks = ({targetService, tracks, setSearchResults}) => {
             return searchResults;
         } catch (error) {
             throw new Error(
-                "An error occurred while fetching search results."
+                "An error occurred while fetching search results. Possibly too many requests."
             );
         }
     };
@@ -80,7 +80,7 @@ const SearchedTracks = ({targetService, tracks, setSearchResults}) => {
             ) : isError ? (
                 <HelperText>
                     <HelperTextItem variant="error" hasIcon>
-                        An error occurred while fetching search results.
+                        An error occurred while fetching search results. Possibly too many requests.
                     </HelperTextItem>
                 </HelperText>
             ) : (

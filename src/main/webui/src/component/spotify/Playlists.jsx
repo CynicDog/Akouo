@@ -41,7 +41,7 @@ const Playlists = () => {
             ) : isError ? (
                 <HelperText>
                     <HelperTextItem variant="error" hasIcon>
-                        An error occurred while fetching search results.
+                        An error occurred while fetching search results. Possibly too many requests.
                     </HelperTextItem>
                 </HelperText>
             ) : (

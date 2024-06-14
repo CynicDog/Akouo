@@ -42,7 +42,7 @@ function Playlists() {
             ) : isError ? (
                 <HelperText>
                     <HelperTextItem variant="error" hasIcon>
-                        An error occurred while fetching search results.
+                        An error occurred while fetching search results. Possibly too many requests.
                     </HelperTextItem>
                 </HelperText>
             ) : (
@@ -163,7 +163,7 @@ const PlaylistDetail = ({playlist}) => {
             ) : isError ? (
                 <HelperText>
                     <HelperTextItem variant="error" hasIcon>
-                        An error occurred while fetching search results.
+                        An error occurred while fetching search results. Possibly too many requests.
                     </HelperTextItem>
                 </HelperText>
             ) : (
@@ -179,12 +179,12 @@ const PlaylistDetail = ({playlist}) => {
                                             {track.attributes.genreNames.join(",")}
                                         </Label>{' '}
                                         <Tooltip content={<div>{track.attributes.artistName}</div>}>
-                                            <Label textMaxWidth="100px" isCompact>
+                                            <Label textMaxWidth="200px" isCompact>
                                                 {track.attributes.artistName}
                                             </Label>
                                         </Tooltip>{' '}
                                         <Tooltip content={<div>{track.attributes.albumName}</div>}>
-                                            <Label isCompact textMaxWidth="100px" color="blue">
+                                            <Label isCompact textMaxWidth="200px" color="blue">
                                                 {track.attributes.albumName}
                                             </Label>
                                         </Tooltip>

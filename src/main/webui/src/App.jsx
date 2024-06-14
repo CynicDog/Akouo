@@ -22,7 +22,6 @@ import AppleIcon from "../public/apple.jsx";
 import SpotifyIcon from "../public/spotify.jsx";
 import AppleComponentsArea from "./component/AppleComponentsArea.jsx";
 import SpotifyComponentsArea from "./component/SpotifyComponentsArea.jsx";
-import AppleMusicPlayer from "./component/apple/AppleMusicPlayer.jsx";
 
 function App() {
 
