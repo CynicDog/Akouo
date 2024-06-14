@@ -26,11 +26,34 @@ const SearchedTracks = ({targetService, tracks, setSearchResults}) => {
 
     const searchTracksData = async (tracks) => {
         try {
+            let storefrontId;
+
+            if (targetService !== 'spotify') {
+                storefrontId = await fetch('https://api.music.apple.com/v1/me/storefront', {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${import.meta.env.VITE_APPLE_DEVELOPER_TOKEN}`,
+                        'Music-User-Token': sessionStorage.getItem("MUT")
+                    }
+                })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error(`Error: ${response.status} ${response.statusText}`);
+                        }
+                        return response.json();
+                    })
+                    .then(data => data.data[0].id)
+                    .catch(error => {
+                        console.error('Failed to fetch storefront:', error);
+                        throw error;
+                    });
+            }
+
             const searchResults = await Promise.all(
                 tracks.map(async (track) => {
                     return targetService === "spotify"
                         ? await searchForItem(track.relationships?.catalog?.data[0]?.attributes?.isrc)
-                        : await fetchMultipleCatalogSongsByISRC(track.track.external_ids.isrc);
+                        : await fetchMultipleCatalogSongsByISRC(track.track.external_ids.isrc, storefrontId);
                 })
             );
             setSearchResults(

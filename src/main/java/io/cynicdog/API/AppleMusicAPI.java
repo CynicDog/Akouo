@@ -92,7 +92,9 @@ public class AppleMusicAPI {
             return;
         }
 
-        String fetchUrl = "https://api.music.apple.com/v1/catalog/kr/songs?filter[isrc]=" + isrc;
+        String storefrontId = ctx.queryParam("storefrontId").stream().findFirst().orElseGet(() -> "us");
+
+        String fetchUrl = "https://api.music.apple.com/v1/catalog/" + storefrontId + "/songs?filter[isrc]=" + isrc;
         fetchData(ctx, fetchUrl, musicUserToken);
     }
 

@@ -17,8 +17,8 @@ export const fetchLibraryPlaylistRelationByName = async (id, relation) => {
 }
 
 // Fetch one or more songs by using their International Standard Recording Code (ISRC) values.
-export const fetchMultipleCatalogSongsByISRC = async (isrc) => {
-    return fetchData(`/api/apple/fetchMultipleCatalogSongsByISRC?isrc=${isrc}`);
+export const fetchMultipleCatalogSongsByISRC = async (isrc, storefrontId) => {
+    return fetchData(`/api/apple/fetchMultipleCatalogSongsByISRC?isrc=${isrc}&storefrontId=${storefrontId}`);
 }
 
 // Create a new playlist in a user’s library.

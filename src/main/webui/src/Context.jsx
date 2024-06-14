@@ -84,13 +84,6 @@ export const AuthProvider = ({ children }) => {
             } else {
                 setIsAppleAuthenticated(true);
                 setAppleUsername(sessionStorage.getItem("APPLE_USERNAME"));
-
-                var myStation =  await music.api.music('/v1/catalog/kr/stations', {
-                    'filter[identity]': 'personal',
-                });
-                if (!music.isQueueEmpty) {
-                    await music.setQueue({ station: myStation.data.data[0].attributes.playParams.id, startPlaying: false });
-                }
             }
         } catch (error) {
             console.error('Error configuring MusicKit:', error);
@@ -103,9 +96,20 @@ export const AuthProvider = ({ children }) => {
                 const response = await musicInstance.authorize();
                 sessionStorage.setItem("MUT", response);
 
-                var station =  await musicInstance.api.music('/v1/catalog/kr/stations', {
+                var storefront = await fetch('https://api.music.apple.com/v1/me/storefront', {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${import.meta.env.VITE_APPLE_DEVELOPER_TOKEN}`,
+                        'Music-User-Token': response
+                    }})
+                    .then(response => {
+                        return response.json();
+                    });
+
+                var station =  await musicInstance.api.music(`/v1/catalog/${storefront.data[0].id}/stations`, {
                     'filter[identity]': 'personal',
                 });
+                
                 var stationId = station.data.data[0].id
                 var stationName = station.data.data[0].attributes.name
 
